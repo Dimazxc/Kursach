@@ -54,7 +54,7 @@
                 { field: "email", title: "E-mail", width: 180 },
                 { field: "phoneNumber", title: "Phone", width: 180 },
                 { field: "lockoutEnabled", title: "Ublock", width: 180 },
-                { command: { text: "View company" }, width: 80 },
+                { command: { text: "View company", click: getUserCompany }, width: 80 },
             ],
             height: 500,
             dataSource: users,
@@ -95,12 +95,12 @@
 
     function getResponse(response) {
         kendo.alert(response);
-        $('#usergrid').data('kendoGrid').dataSource.cancelChanges();
+        $('#usergrid').data('kendoGrid').dataSource.read();
     }
 
-    function getUserCompany() {
-        // post to page with table cmp + button add
-        // function take user id and get page with table 
+    function getUserCompany(e) {
+        var url = '@Url.Action("UserCompaniesTable", "Admin")' + '?id=' + this.dataItem($(e.target).closest("tr")).id;
+        window.location.href = url;
     };
 
 
@@ -109,8 +109,7 @@
         var grid = $("#usergrid").data("kendoGrid");
         var selected = [];
         grid.select().each(function () {
-            selected.push(grid.dataItem(this));
-            console.log(grid.dataItem(this).id)
+            selected.push(grid.dataItem(this).id);
         });
         grid.clearSelection();
         return selected;

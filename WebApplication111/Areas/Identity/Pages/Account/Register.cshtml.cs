@@ -93,6 +93,8 @@ namespace WebApplication111.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
                     await _userManager.AddToRoleAsync(user, "User");
+                    await _userManager.SetLockoutEndDateAsync(user, DateTime.Now);
+                    await _userManager.SetLockoutEnabledAsync(user, false);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                     var callbackUrl = Url.Page(

@@ -1,0 +1,126 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Newtonsoft.Json;
+@using Microsoft.EntityFrameworkCore;
+@using WebApplication111.Data;
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@inject ApplicationDbContext DbContext
+@model IdentityUser
+
+@{
+    ViewData["Title"] = "Privacy Policy";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="tab-content p-3">
+    <div class="col-sm-auto text-center">
+        <div class="input-group-prepend">
+            <h4 class="mb-2">Companies of: USERNAME</h4>
+        </div>
+        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#staticBackdrop">Add Company</button>
+    </div>
+
+    <br>
+
+    <div class="container mt-2 mb-3">
+        <div class="d-flex justify-content-center row">
+            <div class="col-md-12" id="container">
+                <div id="gridcompany"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade bd-example-modal-lg" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Create company</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="modalcreate" novalidate>
+                    <div class="form-group text-center">
+                        <img src="https://img.flaticon.com/icons/png/512/1753/1753543.png?size=1200x630f&pad=10,10,10,10&ext=png&bg=FFFFFFFF" id="dropzone" class="dropzoneCompany" alt="Preview Image" width="200" />
+                    </div>
+                    <div class="form-group row">
+                        <input class="form-control" id="companyName" type="text" value="" placeholder="Company name" required minlength="5" maxlength="15">
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                        <div class="invalid-feedback">
+                            Please choose a valid company name (between 5 and 15 characters).
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input name='tags' id="companyTags" required><div class="valid-feedback">
+                            Looks good!
+                        </div>
+                        <div class="invalid-feedback">
+                            Please add some tags.
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <input class="form-control" id="companyYT" type="url" value="" placeholder="YT video" required>
+                    </div>
+                    <div class="form-group row">
+                        <label>Choose end day of company :</label>
+                        <input id="companyED" class="form-control" onkeydown="return false;" required />
+                    </div>
+                    <div class="form-group row">
+                        <label>Choose theme of company :  </label>
+                        <input id="companyTh" class="form-control" required />
+                    </div>
+                    <div class="form-group row">
+                        <textarea class="form-control" id="companyDesc" rows="4" placeholder="Description" required minlength="200" maxlength="400"></textarea>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                        <div class="invalid-feedback">
+                            Please choose a valid company name (between 200 and 400 characters).
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <input class="form-control" id="companyPrice" type="number" min="1" value="" placeholder="How much money u need?" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://kendo.cdn.telerik.com/2019.2.619/js/jquery.min.js"></script>
+<script src="https://kendo.cdn.telerik.com/2021.1.330/js/kendo.all.min.js"></script>
+<script>
+    var user = @Html.Raw(Json.Serialize(Model));
+    window.onload = function () {
+        dropimage('dropzoneCompany');
+        $.get('/Company/ParseCompaniesTags', {}, function (parsedTags) {
+            Array.prototype.push.apply(tagify.settings.whitelist, parsedTags);
+        });
+    };
+
+    function openread(e) {
+        var url = '@Url.Action("ReadOnlyCmp", "Profile")' + '?id=' + this.dataItem($(e.target).closest("tr")).id;
+        window.location.href = url;
+    }
+
+    function openedit(e) {
+        var url = '@Url.Action("ViewCompany", "Profile")' + '?id=' + this.dataItem($(e.target).closest("tr")).id;
+        window.location.href = url;
+    }
+
+
+</script>
+<script src="~/js/CompanyGrid.js"></script>
+<script src="~/js/Company.js"></script>
+<script src="~/js/TagsCreate.js"></script>
+<script src="~/js/ImageUploader.js"></script>

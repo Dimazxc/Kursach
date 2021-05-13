@@ -148,7 +148,7 @@
                         <img src="https://img.flaticon.com/icons/png/512/1753/1753543.png?size=1200x630f&pad=10,10,10,10&ext=png&bg=FFFFFFFF" id="dropzone" class="dropzoneCompany" alt="Preview Image" width="200" />
                     </div>
                     <div class="form-group row">
-                        <input class="form-control" id="companyName" type="text" value="" placeholder="Company name" required minlength="5" maxlength="15">     
+                        <input class="form-control" id="companyName" type="text" value="" placeholder="Company name" required minlength="5" maxlength="15">
                         <div class="valid-feedback">
                             Looks good!
                         </div>
@@ -169,7 +169,7 @@
                     </div>
                     <div class="form-group row">
                         <label>Choose end day of company :</label>
-                        <input id="companyED" class="form-control" onkeydown="return false;" required/>
+                        <input id="companyED" class="form-control" onkeydown="return false;" required />
                     </div>
                     <div class="form-group row">
                         <label>Choose theme of company :  </label>
@@ -185,7 +185,7 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <input class="form-control" id="companyPrice" type="number" min="1"  value="" placeholder="How much money u need?" required>
+                        <input class="form-control" id="companyPrice" type="number" min="1" value="" placeholder="How much money u need?" required>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -198,10 +198,13 @@
 </div>
 
 
+<script src="https://kendo.cdn.telerik.com/2019.2.619/js/jquery.min.js"></script>
+<script src="https://kendo.cdn.telerik.com/2021.1.330/js/kendo.all.min.js"></script>
 <script depends-on="jquery">
 
     var companies =  @Html.Raw(json);
     var userBonuses = @Html.Raw(jsonUserBonuses);
+
     var mode = 'user'
     var tags = []
     var thems = ["Education", "Electionics", "Science", "Music", "Art", "Game", "Literature"]
@@ -224,7 +227,7 @@
                 } else {
                     event.preventDefault();
                     createCompany();
-                } 
+                }
                 form.classList.add('was-validated');
             }, false);
         });
@@ -243,13 +246,14 @@
 
 
     $(document).ready(function () {
+
         $('#companyED').kendoDatePicker({ format: "{0: yyyy-MM-dd}" });
 
         $("#companyTh").kendoDropDownList({ dataSource: thems });
 
         var cmp = new kendo.data.DataSource({
             transport: {
-                read: {url: "/Company/GetCompanies", data: { 'userId': '@user.Id' }, cache: false}
+                read: { url: "/Company/GetCompanies", data: { 'userId': '@user.Id' }, cache: false }
             }
         });
 

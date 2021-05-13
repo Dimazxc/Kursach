@@ -96,13 +96,10 @@
 <script src="https://kendo.cdn.telerik.com/2021.1.330/js/kendo.all.min.js"></script>
 
 <script>
-
-
     var companiesLastUpdated = @Html.Raw(jsonUpdatedCompanies)
     var companiesMostRated = @Html.Raw(jsonRatedCompanies);
 
     window.onload = function () {
-        $.get('/Home/AddRole', {}, () => { });
         companiesLastUpdated.forEach(cmp => sendCompany('updatedCompanies', cmp, cmp.Ratings.reduce((r, c) => r + c.Rating, 0) / cmp.Ratings.length));
         companiesMostRated.forEach(cmp => sendCompany('ratedCompanies', cmp, cmp.Ratings.reduce((r, c) => r + c.Rating, 0) / cmp.Ratings.length));
         $.get('/Company/ParseCompaniesTags', {}, function (parsedTags) {
@@ -110,8 +107,6 @@
             Array.prototype.push.apply(tagify.settings.whitelist, parsedTags);
         });
     }
-
-    $(".rating").kendoRating({ value: 3 }).data("kendoRating");
 </script>
 <script src="~/js/Company.js"></script>
 <script src="~/js/TagsMainPage.js"></script>

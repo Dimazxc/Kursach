@@ -33,8 +33,19 @@ namespace WebApplication111
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>()
+            services.AddDefaultIdentity<IdentityUser>(options =>
+            {   options.SignIn.RequireConfirmedAccount = true;
+                options.Lockout.AllowedForNewUsers = true;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(999);
+            }
+            ).AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.Configure<SecurityStampValidatorOptions>(options =>
+            {
+                options.ValidationInterval = TimeSpan.Zero;
+            });
+
             services.AddControllersWithViews();
             services.AddRazorPages();
 

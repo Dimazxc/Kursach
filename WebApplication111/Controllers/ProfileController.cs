@@ -24,6 +24,12 @@ namespace WebApplication111.Controllers
         {
             return View();
         }
+
+        public  JsonResult GetCurrentUser()
+        {
+            var currentUser =  _userManager.GetUserAsync(User).GetAwaiter().GetResult();
+            return Json(currentUser);
+        }
         
         public async Task<IActionResult> ReadOnlyCmp(string id)
         {
