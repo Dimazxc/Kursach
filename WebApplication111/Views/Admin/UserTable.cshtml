@@ -1,0 +1,122 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Newtonsoft.Json;
+@using Microsoft.EntityFrameworkCore;
+@using WebApplication111.Data;
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@inject ApplicationDbContext DbContext;
+@model IdentityUser
+
+@{
+    var user = UserManager.GetUserAsync(User).GetAwaiter().GetResult();
+    ViewData["Title"] = "Privacy Policy";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="col-lg-12">
+    <div class="card z-depth-3">
+        <div class="card-body">
+            <div class="tab-content p-3">
+                <h2>User table: </h2>
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        <div id="toolbar"></div>
+                        <div id="usergrid">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var users = new kendo.data.DataSource({
+            pageSize: 10,
+            transport: {
+                read: { url: "/Admin/GetUsers", data: {}, cache: false }
+            }
+        });
+        $("#toolbar").kendoToolBar({
+            items: [
+                { type: "button", text: "Lock user", icon: "lock", click: lockUsers },
+                { type: "button", text: "Unlock user", icon: "unlock", click: unlockUsers },
+                { type: "separator" },
+                { type: "button", text: "Make admin", icon: "user", click: makeadminUsers },
+                { type: "separator" },
+                { type: "button", text: "Delete user", icon:"delete", click: deleteUsers }
+            ]
+        });
+        $("#usergrid").kendoGrid({
+            columns: [
+                { selectable: true, width: "50px" },
+                { field: "userName", title: "Name", width: 180 },
+                { field: "email", title: "E-mail", width: 180 },
+                { field: "phoneNumber", title: "Phone", width: 180 },
+                { field: "lockoutEnabled", title: "Ublock", width: 180 },
+                { command: { text: "View company" }, width: 80 },
+            ],
+            height: 500,
+            dataSource: users,
+            pageable: true,
+            sortable: true,
+            navigatable: true,
+            resizable: true,
+            reorderable: true,
+            groupable: true,
+            filterable: true,
+        });
+    });
+
+
+    function deleteUsers() {
+        $.post('/Admin/DeleteUsers', { '': getSelected()}, (response) => {
+            getResponse(response)
+        })
+    };
+
+    function lockUsers() {
+        $.post('/Admin/LockUsers', { '': getSelected() }, (response) => {
+            getResponse(response)
+        })
+    };
+
+    function unlockUsers() {
+        $.post('/Admin/UnlockUsers', { '': getSelected() }, (response) => {
+            getResponse(response)
+        })
+    };
+
+    function makeadminUsers() {
+        $.post('/Admin/MakeAdmin', { '': getSelected() }, (response) => {
+            getResponse(response)
+        })
+    };
+
+    function getResponse(response) {
+        kendo.alert(response);
+        $('#usergrid').data('kendoGrid').dataSource.cancelChanges();
+    }
+
+    function getUserCompany() {
+        // post to page with table cmp + button add
+        // function take user id and get page with table 
+    };
+
+
+
+    function getSelected() {
+        var grid = $("#usergrid").data("kendoGrid");
+        var selected = [];
+        grid.select().each(function () {
+            selected.push(grid.dataItem(this));
+            console.log(grid.dataItem(this).id)
+        });
+        grid.clearSelection();
+        return selected;
+    }
+
+
+</script>
+
+

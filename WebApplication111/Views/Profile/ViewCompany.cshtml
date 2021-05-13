@@ -1,0 +1,363 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using WebApplication111.Data;
+@using Newtonsoft.Json;
+@using Microsoft.EntityFrameworkCore;
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@inject ApplicationDbContext DbContext;
+@model Company
+
+@{
+    var user = UserManager.GetUserAsync(User).GetAwaiter().GetResult();
+    var jsonBonuses = JsonConvert.SerializeObject(DbContext.Bonuses.Include(i => i.Company).Where(i => i.Company.Id == Model.Id), Formatting.Indented);
+    var jsonNews = JsonConvert.SerializeObject(DbContext.News.Include(i => i.Company).Where(i => i.Company.Id == Model.Id), Formatting.Indented);
+    var jsonGalery = JsonConvert.SerializeObject(DbContext.Galery.Include(i => i.Company).Where(i => i.Company.Id == Model.Id), Formatting.Indented);
+
+    ViewData["Title"] = "";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<div class="container" style="font-family:'Aire Exterior'">
+    <div class="row align-items-center my-5 text-center">
+        <div class="col-lg-7">
+            <img id="imageCompany" class="img-fluid rounded mb-4 mb-lg-0 dropzoneCompany" src="@Model.UrlImage" alt="">
+        </div>
+        <div class="col-lg-4">
+            <h2 class="font-weight-light">@Model.Name</h2>
+        </div>
+    </div>
+
+    <div class="col-lg-12">
+        <div class="card z-depth-3">
+            <div class="card-body">
+                <ul class="nav nav-pills nav-pills-primary nav-justified">
+                    <li class="nav-item">
+                        <a href="#description" data-target="#description" data-toggle="pill" class="nav-link active"><i class="icon-user"></i> <span class="hidden-xs">Description</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#photos" data-target="#photos" data-toggle="pill" class="nav-link"><i class="icon-note"></i> <span class="hidden-xs">Photo gallery</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#news" data-target="#news" data-toggle="pill" class="nav-link"><i class="icon-envelope-open"></i> <span class="hidden-xs">News</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#bonus" data-target="#bonus" data-toggle="pill" class="nav-link"><i class="icon-envelope-open"></i> <span class="hidden-xs">Bonus</span></a>
+                    </li>
+                </ul>
+                <div class="tab-content p-3">
+
+
+
+                    <div class="tab-pane active show" id="description">
+                        <div class="demo-section k-content wide" style="max-width: 644px; margin: auto">
+                            <div id="mediaplayer" style="height:360px"></div>
+                        </div>
+                        <textarea id="descriptionCmp" style="width: 100%;" class="companyText" rows="10">@Model.Description</textarea>
+                        <div class="k-counter-container"><span class="k-counter-value">@Model.Description.Length</span>/300</div>
+                        <div class="alert alert-success" id="alertDescription" style="display:none;">
+                            <strong>Success!</strong> Company updated!
+                        </div>
+                        <a id="updateDescription" class="btn btn-success float-right" href="#">Save changes</a>
+                    </div>
+
+
+
+                    <div class="tab-pane text-center" id="photos">
+                        <a id="" class="btn btn-success" data-toggle="modal" data-target="#modalPhoto" href="#">Add photo</a>
+                        <div id="demo" class="carousel slide" data-ride="carousel">
+                            <div class="carousel-inner" id="photosContainer">
+                                <div class="carousel-item active">
+                                    <img src="https://sun9-31.userapi.com/impg/8BoPgii3Al2X281vOrwMviK_8FW-6BOwFTxIGA/KGbfM8lbXno.jpg?size=1080x720&quality=96&sign=ce7f6ae45bef9fe212b14431b4b76a4b&type=album">
+                                </div>
+                            </div>
+                            <a class="carousel-control-prev" href="#demo" data-slide="prev">
+                                <span class="carousel-control-prev-icon"></span>
+                            </a>
+                            <a class="carousel-control-next" href="#demo" data-slide="next">
+                                <span class="carousel-control-next-icon"></span>
+                            </a>
+                        </div>
+                    </div>
+
+
+
+                    <div class="tab-pane" id="news">
+                        <div class="text-center">
+                            <a class="btn btn-success" data-toggle="modal" data-target="#modalNews" href="#">Add news</a>
+                        </div>
+                        <div class="row  justify-content-center" id="newsContainer">
+                        </div>
+                    </div>
+
+
+
+                    <div class="tab-pane" id="bonus">
+                        <div class="text-center">
+                            <a class="btn btn-success" data-toggle="modal" data-target="#modalBonus" href="#">Add bonus</a>
+                        </div>
+                        <div class="row" id="bonusContainer">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade bd-example-modal-lg" id="modalPhoto" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Add photo to gallery</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="Photo">
+                    <div class="form-group text-center">
+                        <img src="https://mizez.com/custom/mizez/img/general/no-image-available.png" class="dropzonePhoto" alt="Preview Image" id="photoImage" width="200" />
+                    </div>
+                    <div class="form-group row">
+                        <input class="form-control" id="photoTitle" type="text" value="" name="ptitle" placeholder="Label photo" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" id="createPhoto" class="btn btn-primary">Add</button>
+                        <button type="button" style="display:none" id="updatePhoto" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade bd-example-modal-lg" id="modalNews" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title nws-m-title">Work with news</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="News">
+                    <div class="form-group text-center">
+                        <img src="https://mizez.com/custom/mizez/img/general/no-image-available.png" class="img-thumbnail dropzoneNews" id="newsImage" alt="News image (optinal)" width="200" />
+                    </div>
+                    <div class="form-group row">
+                        <input class="form-control" id="newsTitle" type="text" value="" placeholder="News title" name="ntitle" required>
+                    </div>
+                    <div class="form-group row">
+                        <textarea class="form-control" id="newsContent" rows="4" placeholder="News description" name="ndescrip" required></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" id="createNews" class="btn btn-primary">Add</button>
+                        <button type="button" style="display:none" id="updateNews" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bd-example-modal-lg" id="modalBonus" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title bns-m-title">Work with bonus</h5>
+            </div>
+            <div class="modal-body">
+                <form class="Bonus">
+                    <div class="form-group row">
+                        <input class="form-control" id="bonusTitle" type="text" value="" name="btitle" placeholder="Bonus content" required>
+                    </div>
+                    <div class="form-group row">
+                        <input class="form-control" id="bonusPrice" type="number" value="" name="bprice" placeholder="Bonus price" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" id="createBonus" class="btn btn-primary">Add</button>
+                        <button type="button" style="display:none" id="updateBonus" class="btn btn-primary">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/jquery.validation/1.16.0/jquery.validate.min.js"></script>
+<script>
+    var bonuses = @Html.Raw(jsonBonuses);
+    var news = @Html.Raw(jsonNews);
+    var photos = @Html.Raw(jsonGalery);
+    let mode = 'edit'
+    var percentSucces = @Model.Balance* 100 / @Model.Price;
+    var standartDescription = '@Model.Description'
+
+    window.onload = function () {
+        dropimage('dropzoneCompany');
+        dropimage('dropzoneNews');
+        dropimage('dropzonePhoto');
+        bonuses.forEach(b => sendBonus(mode, b.Id, b.Title, b.Price));
+        news.forEach(n => sendNews(n.Id, n.Title, n.Content, n.ImageUrl, mode))
+        photos.forEach(p => sendPhoto(p.Id, p.ImageUrl, p.Title, mode))
+    };
+
+    var newsform = $(".News");
+    var bonusform = $(".Bonus");
+    var photoform = $(".Photo")
+    validForm([newsform, bonusform, photoform]);
+
+    function validForm(forms) {
+        forms.forEach(f => f.validate())
+    }
+
+    $(document).ready(function () {
+
+       $('#progressbar').kendoProgressBar({
+           max: 100,
+           value: percentSucces,
+            type: "percent",
+            min: 0,
+            orientation: "horizontal",
+       });
+
+        $('#percentText').html('taked ' + percentSucces + '%')
+
+        $("#mediaplayer").kendoMediaPlayer({
+            navigatable: true,
+            media: {
+                source: "@Model.UrlVideo"
+            }
+        });
+
+        $("#descriptionCmp").on('input', function (e) {
+            $('.k-counter-container .k-counter-value').html($(e.target).val().length);
+        });
+    });
+
+    $('#updateDescription').on('click', function () {
+        var description = select('#descriptionCmp').value();
+        if (description.length < 200) kendo.alert("Minimal length of description - 200 symbols!")
+        else {
+                $.post('/Company/UpdateDescription', { 'companyId': '@Model.Id', 'newDescription': description, 'imageUrl': select('#imageCompany').elt.src  }, function () {
+                alertingSucces('alertDescription');
+                standartDescription = description;
+            })
+        }
+    });
+
+    function alertingSucces(alertId) {
+        $('#' + alertId).fadeIn(1000);
+        setTimeout(function () {
+            $('#' + alertId).fadeOut(1000);
+        }, 2000);
+    }
+
+    $('#createBonus').on('click', function () {
+        if (bonusform.valid()) {
+            var newBonus = {
+                id: window.URL.createObjectURL(new Blob([])).substring(31),
+                title: select('#bonusTitle').elt.value,
+                price: select('#bonusPrice').elt.value,
+            }
+            $.post('/Bonus/AddBonus', { 'bonus': newBonus, 'companyId': '@Model.Id' }, function () {
+                sendBonus(mode, newBonus.id, newBonus.title, newBonus.price)
+                $("#modalBonus").modal('hide')
+                clearModal('Bonus');
+            });
+        }
+    })
+
+
+    $('#updateBonus').on('click', function () {
+        if (bonusform.valid()) {
+            var updateBonus = {
+                id: select('.bns-m-title').id(),
+                title: select('#bonusTitle').elt.value,
+                price: select('#bonusPrice').elt.value,
+            }
+            $.post('/Bonus/UpdateBonus', { 'bonus': updateBonus, 'companyId': '@Model.Id' }, function (response) {
+                if (response) bonusMap.get(updateBonus.id).editField(updateBonus);
+                else kendo.alert('This bonus bought! Failed operation!')
+                $("#modalBonus").modal('hide')
+                clearModal('Bonus');
+            });
+        }
+    })
+
+    $('#createNews').on('click', function () {
+        if (newsform.valid()) {
+            var newNews = {
+                id: window.URL.createObjectURL(new Blob([])).substring(31),
+                title: select('#newsTitle').elt.value,
+                imageurl: select('#newsImage').elt.src,
+                content: select('#newsContent').elt.value,
+            }
+            $.post('/News/AddNews', { 'news': newNews, 'companyId': '@Model.Id' }, function () {
+                sendNews(newNews.id, newNews.title, newNews.content, newNews.imageurl, mode)
+                $("#modalNews").modal('hide')
+                clearModal('News');
+            });
+        }
+    })
+
+    $('#updateNews').on('click', function () {
+        if (newsform.valid()) {
+            var updateNews = {
+                id: select('.nws-m-title').id(),
+                title: select('#newsTitle').elt.value,
+                imageurl: select('#newsImage').elt.src,
+                content: select('#newsContent').elt.value,
+            }
+            $.post('/News/UpdateNews', { 'news': updateNews, 'companyId': '@Model.Id' }, function () {
+                newsmap.get(updateNews.id).editField(updateNews);
+                $("#modalNews").modal('hide')
+                clearModal('News');
+            });
+        }
+     })
+
+
+    $('#createPhoto').on('click', function () {
+        if (photoform.valid()) {
+            var newPhoto = {
+                id: window.URL.createObjectURL(new Blob([])).substring(31),
+                imageurl: select('#photoImage').elt.src,
+                title: select('#photoTitle').elt.value,
+            }
+            $.post('/Gallery/AddPhoto', { 'photo': newPhoto, 'companyId': '@Model.Id' }, function () {
+                sendPhoto(newPhoto.id, newPhoto.imageurl, newPhoto.title, mode);
+                $("#modalPhoto").modal('hide')
+                clearModal('Photo');
+            });
+        }
+    })
+
+    $('[data-dismiss=modal]').on('click', function (e) {
+        clearModal($(this).parent().parent()[0].className)
+    })
+
+    function clearModal(className) {
+        if (select('#newsImage') != null) select('#newsImage').elt.removeAttribute('style');
+        if (select('.dropzone' + className) != null) select('.dropzone' + className).elt.src = 'https://mizez.com/custom/mizez/img/general/no-image-available.png'
+        if (select('#update' + className) != null) select('#update' + className).elt.style.display = "none"
+        if (select('#create' + className) != null) select('#create' + className).elt.removeAttribute('style')
+        $('.'+ className).children('.form-group').children('.form-control').val('');
+    }
+</script>
+<script src="~/js/ImageGallery.js"></script>
+<script src="~/js/Bonus.js"></script>
+<script src="~/js/News.js"></script>
+<script src="~/js/ImageUploader.js"></script>

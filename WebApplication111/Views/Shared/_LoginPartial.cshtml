@@ -1,0 +1,91 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle notranslate" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <img style="float: left; padding-right: 10px;" src="https://img.icons8.com/offices/20/000000/test-account.png" /> @UserManager.GetUserName(User)
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="nav-link" asp-area="" asp-controller="Profile" asp-action="Privacy" title="Manage">Manage profile</a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                         <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="UserTable" title="Manage">Admin panel</a>
+                    }
+                    <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                        <button type="submit" class="nav-link btn btn-link">Logout</button>
+                    </form>
+                </div>
+            </div>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Registration</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
+        </li>
+    }
+    <li class="nav-item">
+        <button class="btn btn-primary" type="button" aria-haspopup="true" aria-expanded="false" data-toggle="modal" data-target="#modalSearch">
+            <i class="fas fa-search"></i>
+        </button>
+    </li>
+    <li>
+        <div class="dropdown">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Settings
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item btn btn-outline-info btn-lg ml-auto font-weight-normal" onmousedown="changeLanguage('ru')"><img src="https://img.icons8.com/cute-clipart/32/000000/russian-federation.png" /></a>
+                <a class="dropdown-item btn btn-outline-info btn-lg ml-auto font-weight-bold" onmousedown="changeLanguage('en')"><img src="https://img.icons8.com/cute-clipart/32/000000/great-britain.png" /></a>
+                <a href="javascript:void()" class="dropdown-item btn btn-outline-info btn-lg ml-auto font-weight-bold" id="theme-toggler" onclick="toggleTheme()"></a>
+            </div>
+        </div>
+    </li>
+</ul>
+
+<div class="modal fade bd-example-modal-lg" id="modalSearch" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg mt-0">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title bns-m-title">Type info please</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="Search">
+                    <div class="form-group row">
+                        <input class="form-control" id="searchBox" type="text" value="" placeholder="Search">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $('#searchBox').on('input', function () {
+        if (this.value.length > 0) {
+            var text = this.value.replaceAll(' ', '||')
+            $.get('/Home/Test', { information: text }, function (data) {
+                console.log(data);
+            });
+        }
+    });
+
+    $('[data-dismiss=modal]').on('click', function (e) {
+        document.querySelector('#searchBox').value = ''
+    })
+
+</script>
+
+

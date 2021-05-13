@@ -1,0 +1,354 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Newtonsoft.Json;
+@using Microsoft.EntityFrameworkCore;
+@using WebApplication111.Data;
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@inject ApplicationDbContext DbContext;
+@model IdentityUser
+
+@{
+    var user = UserManager.GetUserAsync(User).GetAwaiter().GetResult();
+    ViewData["Title"] = "Privacy Policy";
+    var companies = DbContext.Companies.Where(i => i.UserId == user.Id);
+    string json = JsonConvert.SerializeObject(companies, Formatting.Indented);
+    string jsonUserBonuses = JsonConvert.SerializeObject(DbContext.UsersBonuses.Include(i => i.Bonus).Where(i => i.UserId == user.Id), Formatting.Indented, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, ContractResolver = new IncludeIgnored(true) });
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-9 mx-auto">
+            <div class="profile-card-4 z-depth-3">
+                <div class="card">
+                    <div class="card-body text-center bg-primary rounded-top">
+                        <div class="user-box">
+                            <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="user avatar">
+                        </div>
+                        <h5 class="mb-1 text-white">@user.UserName</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group shadow-none">
+                            <li class="list-group-item">
+                                <div class="list-icon">
+                                    <i class="fa fa-phone-square"></i>
+                                </div>
+                                <div class="list-details">
+                                    <span>@user.PhoneNumber</span>
+                                    <small>Mobile Number</small>
+                                </div>
+                            </li>
+                            <li class="list-group-item">
+                                <div class="list-icon">
+                                    <i class="fa fa-envelope"></i>
+                                </div>
+                                <div class="list-details">
+                                    <span>@user.Email</span>
+                                    <small>Email Address</small>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="card z-depth-3">
+                <div class="card-body">
+                    <ul class="nav nav-pills nav-pills-primary nav-justified">
+                        <li class="nav-item">
+                            <a href="#edit" data-target="#edit" data-toggle="pill" class="nav-link active"><i class="icon-user"></i> <span class="hidden-xs">Profile</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#companies" data-target="#companies" data-toggle="pill" class="nav-link"><i class="icon-note"></i> <span class="hidden-xs">My company</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#bonus" data-target="#bonus" data-toggle="pill" class="nav-link"><i class="icon-envelope-open"></i> <span class="hidden-xs">Bonus list</span></a>
+                        </li>
+                    </ul>
+                    <div class="tab-content p-3">
+
+                        <div class="tab-pane" id="companies">
+                            <div class="col-sm-auto text-center">
+                                <div class="input-group-prepend">
+                                    <h4 class="mb-2">My companies</h4>
+                                </div>
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#staticBackdrop">Add Company</button>
+                            </div>
+
+                            <br>
+
+                            <div class="container mt-2 mb-3">
+                                <div class="d-flex justify-content-center row">
+                                    <div class="col-md-12" id="container">
+                                        <div id="gridcompany"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="tab-pane" id="bonus">
+                            <div class="row" id="bonusContainer">
+                            </div>
+                        </div>
+
+                        <div class="tab-pane active show" id="edit">
+                            <form method="post">
+                                <div asp-validation-summary="All" class="text-danger"></div>
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">Name</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" asp-for="UserName" type="text" value="@user.UserName">
+                                        <span asp-validation-for="UserName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">Email</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="email" asp-for="Email" value="@user.Email">
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label">Phone number</label>
+                                    <div class="col-lg-9">
+                                        <input class="form-control" type="tel" asp-for="PhoneNumber" value="@user.PhoneNumber">
+                                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-lg-3 col-form-label form-control-label"></label>
+                                    <div class="col-lg-9">
+                                        <input type="submit" class="btn btn-primary" asp-controller="Profile" asp-action="Edit" asp-route-id="@user.Id" value="Save Changes">
+                                        <input type="reset" class="btn btn-secondary" asp-controller="Profile" asp-action="CancelEdit" value="Cancel">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade bd-example-modal-lg" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Create company</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="modalcreate" novalidate>
+                    <div class="form-group text-center">
+                        <img src="https://img.flaticon.com/icons/png/512/1753/1753543.png?size=1200x630f&pad=10,10,10,10&ext=png&bg=FFFFFFFF" id="dropzone" class="dropzoneCompany" alt="Preview Image" width="200" />
+                    </div>
+                    <div class="form-group row">
+                        <input class="form-control" id="companyName" type="text" value="" placeholder="Company name" required minlength="5" maxlength="15">     
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                        <div class="invalid-feedback">
+                            Please choose a valid company name (between 5 and 15 characters).
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input name='tags' id="companyTags" required><div class="valid-feedback">
+                            Looks good!
+                        </div>
+                        <div class="invalid-feedback">
+                            Please add some tags.
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <input class="form-control" id="companyYT" type="url" value="" placeholder="YT video" required>
+                    </div>
+                    <div class="form-group row">
+                        <label>Choose end day of company :</label>
+                        <input id="companyED" class="form-control" onkeydown="return false;" required/>
+                    </div>
+                    <div class="form-group row">
+                        <label>Choose theme of company :  </label>
+                        <input id="companyTh" class="form-control" required />
+                    </div>
+                    <div class="form-group row">
+                        <textarea class="form-control" id="companyDesc" rows="4" placeholder="Description" required minlength="200" maxlength="400"></textarea>
+                        <div class="valid-feedback">
+                            Looks good!
+                        </div>
+                        <div class="invalid-feedback">
+                            Please choose a valid company name (between 200 and 400 characters).
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <input class="form-control" id="companyPrice" type="number" min="1"  value="" placeholder="How much money u need?" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Create</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script depends-on="jquery">
+
+    var companies =  @Html.Raw(json);
+    var userBonuses = @Html.Raw(jsonUserBonuses);
+    var mode = 'user'
+    var tags = []
+    var thems = ["Education", "Electionics", "Science", "Music", "Art", "Game", "Literature"]
+
+    window.onload = function () {
+        dropimage('dropzoneCompany');
+        userBonuses.forEach(b => sendBonus(mode, b.Id, b.Bonus.Title, b.Bonus.Price, b.Bonus.Company.Name));
+        $.get('/Company/ParseCompaniesTags', {}, function (parsedTags) {
+            Array.prototype.push.apply(tagify.settings.whitelist, parsedTags);
+        });
+    };
+
+    (() => { 'use strict';
+        const forms = document.querySelectorAll('.modalcreate');
+        Array.prototype.slice.call(forms).forEach((form) => {
+            form.addEventListener('submit', (event) => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else {
+                    event.preventDefault();
+                    createCompany();
+                } 
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+
+
+    jQuery(document).ready(function () {
+        jQuery('a[data-toggle="pill"]').on('show.bs.tab', function (e) {
+            localStorage.setItem('activeTab', jQuery(e.target).attr('href'));
+        });
+        var activeTab = localStorage.getItem('activeTab');
+        if (activeTab) {
+            jQuery('a[href="' + activeTab + '"]').tab('show');
+        }
+    });
+
+
+    $(document).ready(function () {
+        $('#companyED').kendoDatePicker({ format: "{0: yyyy-MM-dd}" });
+
+        $("#companyTh").kendoDropDownList({ dataSource: thems });
+
+        var cmp = new kendo.data.DataSource({
+            transport: {
+                read: {url: "/Company/GetCompanies", data: { 'userId': '@user.Id' }, cache: false}
+            }
+        });
+
+        $("#gridcompany").kendoGrid({
+            columns: [
+                { field: "id", hidden: true, 'editable': function () { return false } },
+                { field: "name", width: 100 },
+                { field: "price", width: 100 },
+                { field: "urlVideo", width: 150},
+                { field: "endDay", width: 100, editor: endDayPicker, type: "date", format: "{0: yyyy-MM-dd}" },
+                { field: "theme", width: 100, editor: themeDropDownEditor },
+                { command: "edit", width: 80 },
+                { command: { text: "Delete", click: deletecompany }, width: 80 },
+                { command: { text: "Open read", click: openread }, width: 80 },
+                { command: { text: "Open edit", click: openedit }, width: 80 },
+            ],
+            editable: "popup",
+            dataSource: cmp,
+            pageable: true,
+            sortable: true,
+            navigatable: true,
+            resizable: true,
+            reorderable: true,
+            groupable: true,
+            filterable: true,
+            edit: function (e) {
+                this.one("save", function () {
+                    $.post('/Company/UpdateCompany', { '': JSON.stringify(e.model) }, function () {
+                        $("#gridcompany").data("kendoGrid").dataSource.read();
+                    })
+                });
+                this.one("cancel", function () {
+                    $('#gridcompany').data('kendoGrid').dataSource.cancelChanges();
+                });
+            }
+        });
+    })
+
+    function themeDropDownEditor(container, options) {
+        $('<input required name="' + options.field + '"/>').appendTo(container).kendoDropDownList({ dataSource: thems });
+    }
+
+    function endDayPicker(container, options) {
+        $('<input required name="' + options.field + '"/>').appendTo(container).kendoDatePicker();
+    }
+
+    function deletecompany(e) {
+        var tr = $(e.target).closest("tr");
+        var id = this.dataItem(tr).id;
+        kendo.confirm("Are you sure that you want delete this company?").then(function () {
+            $.post('/Company/DeleteCompany', { '': id }, function () {
+                $("#gridcompany").data("kendoGrid").dataSource.read();
+            });
+        }, function () { });
+    }
+
+    $('[data-dismiss=modal]').on('click', function (e) {
+        clearModal();
+    })
+
+    function openread(e) {
+        var url = '@Url.Action("ReadOnlyCmp", "Profile")' + '?id=' + this.dataItem($(e.target).closest("tr")).id;
+        window.location.href = url;
+    }
+
+    function openedit(e) {
+        var url = '@Url.Action("ViewCompany", "Profile")' + '?id=' + this.dataItem($(e.target).closest("tr")).id;
+        window.location.href = url;
+    }
+
+    createCompany = function() {
+        var newCompany = {
+            id: window.URL.createObjectURL(new Blob([])).substring(31),
+            name: select('#companyName').elt.value,
+            urlvideo: select('#companyYT').elt.value,
+            urlimage: select('.dropzoneCompany').elt.src,
+            description: select('#companyDesc').elt.value,
+            price: select('#companyPrice').elt.value,
+            userId: '@user.Id',
+            tags: configureTags(),
+            theme: select('#companyTh').elt.value,
+            endDay: select('#companyED').elt.value
+        }
+        $.post('/Company/AddCompany', { '': newCompany }, function () {
+            $("#gridcompany").data("kendoGrid").dataSource.read();
+            clearModal();
+            $("#staticBackdrop").modal('hide')
+        })
+    }
+
+    clearModal = function () {
+        $('.tagify').children('.tagify__tag').remove()
+        document.getElementById('dropzone').src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFLS0UEwpcXzZGU1PgVHnrr2cujesChZtnsw&usqp=CAU'
+        $('.modalcreate').children('.form-group ').children('.form-control').val('');
+    }
+
+</script>
+<script src="~/js/Company.js"></script>
+<script src="~/js/TagsCreate.js"></script>
+<script src="~/js/imageloader.js"></script>
+<script src="~/js/Bonus.js"></script>
+<script src="~/js/ImageUploader.js"></script>

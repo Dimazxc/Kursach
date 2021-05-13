@@ -1,0 +1,117 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using WebApplication111.Data;
+@using Microsoft.EntityFrameworkCore;
+@using Newtonsoft.Json;
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@inject ApplicationDbContext DbContext
+
+@{
+    double averageCompanies = 0;
+    var jsonUpdatedCompanies = JsonConvert.SerializeObject(DbContext.Companies.Include(i => i.Ratings).OrderByDescending(i => i.UpdatedDay).Take(9), Formatting.Indented, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, ContractResolver = new IncludeIgnored(true) });
+    var companies = DbContext.Companies.Include(i => i.Ratings).Where(i => i.Ratings.Count() > 0).ToList();
+    if (DbContext.Ratings.Count() > 0) averageCompanies = companies.Average(i => i.Ratings.Average(i => i.Rating));
+    var jsonRatedCompanies = JsonConvert.SerializeObject(DbContext.Companies.Include(i => i.Ratings).OrderByDescending(i => (i.Ratings.Average(i => i.Rating) * i.Ratings.Count() + averageCompanies) / i.Ratings.Count()).Take(9), Formatting.Indented, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, ContractResolver = new IncludeIgnored(true) });
+    ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div id="demo1" class="carousel slide" data-ride="carousel">
+    <ul class="carousel-indicators" style="z-index:1">
+        <li data-target="#demo1" data-slide-to="0" class="active"></li>
+        <li data-target="#demo1" data-slide-to="1" class=""></li>
+        <li data-target="#demo1" data-slide-to="2" class=""></li>
+    </ul>
+    <div class="carousel-inner">
+        <div class="carousel-item active">
+            <img src="https://sun9-63.userapi.com/impg/Wp_FGhD53XQ1vOyftytft0xXeRNOATH0BVFbfw/YZWXfehc3YM.jpg?size=1080x352&quality=96&sign=f77f5cdff6abdbb259f3105126b38643&type=album" alt="Los Angeles" style="width:100%;height:100%;">
+            <div class="carousel-caption">
+                <h3></h3>
+                <p></p>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <img src="https://sun9-17.userapi.com/impg/gKgnlurHOCcOMFrIAmy9omjMey8W8N5Fn4tt7w/-12N5GgigHg.jpg?size=1080x356&quality=96&sign=057992b39d602655d4cf09e6b6ea2eef&type=album" alt="Chicago" style="width:100%;height:100%;">
+            <div class="carousel-caption">
+                <h3></h3>
+                <p></p>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <img src="https://sun9-2.userapi.com/impg/3CDs-_URDBJS2m5_5BEo1a263Fa_jf6gjY5Krw/jTJ7Dlt_MJo.jpg?size=1080x358&quality=96&sign=25e5da74cb9bc28cd168b2b87b0f998b&type=album" alt="New York" style="width:100%;height:100%;">
+            <div class="carousel-caption">
+                <h3></h3>
+                <p></p>
+            </div>
+        </div>
+    </div>
+    <a class="carousel-control-prev" href="#demo1" data-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+    </a>
+    <a class="carousel-control-next" href="#demo1" data-slide="next">
+        <span class="carousel-control-next-icon"></span>
+    </a>
+</div>
+<br>
+<br>
+
+<h2>Add some tags for filter: </h2>
+<input name='tags' class='some_class_name' style="font-size:12px" placeholder='write some tags'>
+<br>
+<div class="text-center"><button class="btnfilter btn-success">Filter</button></div>
+<br>
+
+<h2>Last updated companies: </h2>
+<div class="card-group" id="updatedCompanies">
+</div>
+
+<br>
+<br>
+<h2>The most rated companies: </h2>
+<div class="card-group" id="ratedCompanies">
+
+</div>
+
+<style>
+    .imgcard {
+        width: 100%;
+        height: 200px;
+    }
+
+        .imgcard:hover {
+            opacity: 1;
+        }
+
+    .btnfilter {
+        height: 50px;
+        width: 50%;
+        font-size: 20px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+</style>
+
+<script src="https://kendo.cdn.telerik.com/2019.2.619/js/jquery.min.js"></script>
+<script src="https://kendo.cdn.telerik.com/2021.1.330/js/kendo.all.min.js"></script>
+
+<script>
+
+
+    var companiesLastUpdated = @Html.Raw(jsonUpdatedCompanies)
+    var companiesMostRated = @Html.Raw(jsonRatedCompanies);
+
+    window.onload = function () {
+        $.get('/Home/AddRole', {}, () => { });
+        companiesLastUpdated.forEach(cmp => sendCompany('updatedCompanies', cmp, cmp.Ratings.reduce((r, c) => r + c.Rating, 0) / cmp.Ratings.length));
+        companiesMostRated.forEach(cmp => sendCompany('ratedCompanies', cmp, cmp.Ratings.reduce((r, c) => r + c.Rating, 0) / cmp.Ratings.length));
+        $.get('/Company/ParseCompaniesTags', {}, function (parsedTags) {
+            console.log(parsedTags)
+            Array.prototype.push.apply(tagify.settings.whitelist, parsedTags);
+        });
+    }
+
+    $(".rating").kendoRating({ value: 3 }).data("kendoRating");
+</script>
+<script src="~/js/Company.js"></script>
+<script src="~/js/TagsMainPage.js"></script>
