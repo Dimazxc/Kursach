@@ -4,7 +4,11 @@ function setup() {
 class Company {
     constructor(containerId, cmp, avgrate) {
         let container = select('#' + containerId);
-        this.mainDiv = createDiv('').addClass('col-md-4 mb-5').parent(container).id(cmp.Id);
+        this.mainDiv = createDiv('').addClass('col-md-4 mb-5').parent(container).id(cmp.Id).attribute('style', 'cursor:pointer');
+        this.mainDiv.elt.addEventListener('click', () => {
+            var url = '/Profile/ReadOnlyCmp' + '?id=' + this.mainDiv.elt.id;
+            window.location.href = url;
+        }, false);
         this.cardDiv = createDiv('').addClass('card h-100').parent(this.mainDiv);
         this.image = createImg(cmp.UrlImage).addClass('card-img-top imgcard').parent(this.cardDiv);
         this.cardBody = createDiv('').addClass('card-body').parent(this.cardDiv);
@@ -30,6 +34,7 @@ class Company {
 
 function sendCompany(containerId, cmp, avgrate) {
     let company = new Company(containerId, cmp, avgrate)
+
 }
 
 

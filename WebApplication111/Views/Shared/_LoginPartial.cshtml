@@ -14,7 +14,7 @@
                     <a class="nav-link" asp-area="" asp-controller="Profile" asp-action="Privacy" title="Manage">Manage profile</a>
                     @if (User.IsInRole("Admin"))
                     {
-                         <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="UserTable" title="Manage">Admin panel</a>
+                        <a class="nav-link" asp-area="" asp-controller="Admin" asp-action="UserTable" title="Manage">Admin panel</a>
                     }
                     <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                         <button type="submit" class="nav-link btn btn-link">Logout</button>
@@ -66,24 +66,48 @@
                         <input class="form-control" id="searchBox" type="text" value="" placeholder="Search">
                     </div>
                 </form>
+                <div class="col-12">
+                    <div class="list-group mt-2" id="searchResult">
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+    #searchResult{
+        font-size: 30px;
+        border-width: 5px;
+        border-color: chartreuse;
+    }
+
+    
+</style>
+
+
 <script>
 
     $('#searchBox').on('input', function () {
         if (this.value.length > 0) {
-            var text = this.value.replaceAll(' ', '||')
-            $.get('/Home/Test', { information: text }, function (data) {
-                console.log(data);
+            var text = createTermWord(this.value);
+            $.get('/Home/SearchCompany', { information: text }, function (companies) {
+                var containerResult = select('#searchResult');
+                $('#searchResult').empty();
+                companies.forEach(company => {
+                    var poiner = createElement('a').addClass('list-group-item list-group-item-action').html(company.name).attribute('href', '/Profile/ReadOnlyCmp?id=' + company.id).parent(containerResult);
+                })
             });
         }
     });
 
+    function createTermWord(text) {
+        return text.replaceAll(' ', '* or ').concat('*');
+    }
+    
     $('[data-dismiss=modal]').on('click', function (e) {
         document.querySelector('#searchBox').value = ''
+        $('#searchResult').empty();
     })
 
 </script>

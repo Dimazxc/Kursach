@@ -57,10 +57,12 @@
 <br>
 
 <h2>Add some tags for filter: </h2>
-<input name='tags' class='some_class_name' style="font-size:12px" placeholder='write some tags'>
+<input name='tags' style="font-size:15px" placeholder='write some tags' id="finder">
 <br>
-<div class="text-center"><button class="btnfilter btn-success">Filter</button></div>
+<div class="text-center"><button class="btnfilter btn-success" id="filterbutton">Filter</button></div>
 <br>
+<div class="card-group" id="filteredCompanies">
+</div>
 
 <h2>Last updated companies: </h2>
 <div class="card-group" id="updatedCompanies">
@@ -90,6 +92,14 @@
         margin-top: 20px;
         margin-bottom: 20px;
     }
+
+    .tagify{
+        font-size:20px;
+    }
+
+    .tagify__input:focus {
+        font-size: 20px;
+    }
 </style>
 
 <script src="https://kendo.cdn.telerik.com/2019.2.619/js/jquery.min.js"></script>
@@ -103,10 +113,25 @@
         companiesLastUpdated.forEach(cmp => sendCompany('updatedCompanies', cmp, cmp.Ratings.reduce((r, c) => r + c.Rating, 0) / cmp.Ratings.length));
         companiesMostRated.forEach(cmp => sendCompany('ratedCompanies', cmp, cmp.Ratings.reduce((r, c) => r + c.Rating, 0) / cmp.Ratings.length));
         $.get('/Company/ParseCompaniesTags', {}, function (parsedTags) {
-            console.log(parsedTags)
             Array.prototype.push.apply(tagify.settings.whitelist, parsedTags);
         });
     }
+
+    $('#filterbutton').on('click', function () {
+        if (document.getElementById("finder").value.length > 0) {
+            var list = JSON.parse(document.getElementById("finder").value);
+            var tags = [];
+            list.forEach(tag => (tags.push(tag.value)));
+            $.post('/Home/FilterCompany', { 'tags': tags }, function (jsoncompanies) {
+                $('#filteredCompanies').empty();
+                companies = JSON.parse(jsoncompanies);
+                companies.forEach(cmp => sendCompany('filteredCompanies', cmp, cmp.Ratings.reduce((r, c) => r + c.Rating, 0) / cmp.Ratings.length));
+            });
+        } else $('#filteredCompanies').empty();
+    })
+
+
+
 </script>
 <script src="~/js/Company.js"></script>
 <script src="~/js/TagsMainPage.js"></script>

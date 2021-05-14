@@ -62,10 +62,13 @@ class ReadOnlyBonus extends Bonus {
     }
 
     donate() {
-        select('#userbonusTitle').html(this.title.elt.innerHTML);
-        select('#userbonusPrice').html(this.priceHtml.elt.innerHTML);
-        select('.modal-header').id(this.maindiv.elt.id);
-        $('#modalUserBonus').modal();
+        if (curruser == null) $('#logregmodal').modal();
+        else {
+            select('#userbonusTitle').html(this.title.elt.innerHTML);
+            select('#userbonusPrice').html(this.priceHtml.elt.innerHTML);
+            select('.modal-header').id(this.maindiv.elt.id);
+            $('#modalUserBonus').modal();
+        }
     }
 }
 

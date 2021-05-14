@@ -13,17 +13,17 @@ using WebApplication111.Models;
 using Korzh.EasyQuery.Linq;
 using MoreLinq;
 using Microsoft.EntityFrameworkCore;
+using SoftCircuits.FullTextSearchQuery;
+using Newtonsoft.Json;
 
 namespace WebApplication111.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly UserManager<IdentityUser> userManager;
         private readonly ApplicationDbContext context;
         public HomeController(ILogger<HomeController> logger, UserManager<IdentityUser> userManager, ApplicationDbContext context)
         {
-            _logger = logger;
             this.userManager = userManager;
             this.context = context;
         }
@@ -33,17 +33,30 @@ namespace WebApplication111.Controllers
             return View();
         }
 
-        public JsonResult Test(string information)
+        public JsonResult SearchCompany(string information)
         {
-            var soughtCompanies = new List<SearchCompanyModel>();      
-            var companies = context.Companies.FullTextSearchQuery(information).Select(i => new SearchCompanyModel(i.Id, i.Name)).ToList();
-            var companiesNews = context.News.FullTextSearchQuery(information).Select(i => new SearchCompanyModel(i.Company.Id, i.Company.Name)).ToList();
-            var companiesBonuses = context.Bonuses.FullTextSearchQuery(information).Select(i => new SearchCompanyModel(i.Company.Id, i.Company.Name)).ToList();
-            var companiesComments = context.Comments.FullTextSearchQuery(information).Select(i => new SearchCompanyModel(i.Company.Id, i.Company.Name)).ToList();
-            soughtCompanies = companies.Concat(companiesNews).Concat(companiesBonuses).Concat(companiesComments).DistinctBy(i => i.Id).ToList();
-
+            FtsQuery ftsQuery = new FtsQuery(true);
+            string searchTerm = ftsQuery.Transform(information);
+            var cmp = context.Companies.Where(i => EF.Functions.Contains(i.Name, searchTerm) || EF.Functions.Contains(i.Description, searchTerm));
+            var news = context.News.Include(i => i.Company).Where(i => EF.Functions.Contains(i.Content, searchTerm) || EF.Functions.Contains(i.Title, searchTerm)).Select(i => i.Company);
+            var bonuses = context.Bonuses.Include(i => i.Company).Where(i => EF.Functions.Contains(i.Title, searchTerm)).Select(i => i.Company);
+            var comments = context.Comments.Include(i => i.Company).Where(i => EF.Functions.Contains(i.Content, searchTerm) || EF.Functions.Contains(i.Title, searchTerm)).Select(i => i.Company);
+            var soughtCompanies = cmp.Concat(news).Concat(bonuses).Concat(comments).DistinctBy(i => i.Id).ToList();
             return Json(soughtCompanies);
         }
+
+        public JsonResult FilterCompany(string[] tags)
+        {
+            var soughtCompanies = new List<Company>();
+            var companies = context.Companies.Include(i => i.Ratings).ToList();
+            foreach (var tag in tags)
+            {
+                soughtCompanies.AddRange(companies.Where(i => i.Tags.Contains(tag)));
+            }
+            var jsonRatedCompanies = JsonConvert.SerializeObject(soughtCompanies.DistinctBy(i => i.Id).ToList(), Formatting.Indented, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, ContractResolver = new IncludeIgnored(true) });
+            return Json(jsonRatedCompanies);
+        }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

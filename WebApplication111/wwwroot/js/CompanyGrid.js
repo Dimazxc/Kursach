@@ -1,7 +1,6 @@
 ﻿
-
-
 var thems = ["Education", "Electionics", "Science", "Music", "Art", "Game", "Literature"]
+
 $(document).ready(function () {
 
     var cmp = new kendo.data.DataSource({

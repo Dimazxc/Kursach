@@ -34,7 +34,7 @@ class Comment {
     generateRate() {
         this.comRate = {
             id: window.URL.createObjectURL(new Blob([])).substring(31),
-            UserId: userId,
+            UserId: curruser.id,
         }
     }
 
@@ -48,18 +48,21 @@ class Comment {
 
 
     changecommentrating(divSend, divRemove, rateState, icon, iconRemove) {
-        this.generateRate(), this.comRate.islike = rateState;
-        if (!divSend.class().includes(activeState)) {
-            $.post('/CommentRating/AddCommentRating', { 'commentRating': this.comRate, 'commentId': this.mainDiv.id(), 'userId': userId }, function () { });
-            if (divRemove.class().includes(activeState)) iconRemove.html(parseInt(iconRemove.html()) - 1);
-            icon.html(parseInt(icon.html()) + 1);
-            divSend.addClass('pressed')
-            divRemove.removeClass('pressed')
-        }
-        else {
-            icon.html(parseInt(icon.html()) - 1);
-            divSend.removeClass('pressed')
-            $.post('/CommentRating/RemoveCommentRating', { 'userId': userId, 'commentId': this.mainDiv.id() }, function () {});
+        if (curruser == null) $('#logregmodal').modal();
+            else {
+            this.generateRate(), this.comRate.islike = rateState;
+            if (!divSend.class().includes(activeState)) {
+                $.post('/CommentRating/AddCommentRating', { 'commentRating': this.comRate, 'commentId': this.mainDiv.id(), 'userId': curruser.id }, function () { });
+                if (divRemove.class().includes(activeState)) iconRemove.html(parseInt(iconRemove.html()) - 1);
+                icon.html(parseInt(icon.html()) + 1);
+                divSend.addClass('pressed')
+                divRemove.removeClass('pressed')
+            }
+            else {
+                icon.html(parseInt(icon.html()) - 1);
+                divSend.removeClass('pressed')
+                $.post('/CommentRating/RemoveCommentRating', { 'userId': curruser.id, 'commentId': this.mainDiv.id() }, function () { });
+            }
         }
     }
 }
