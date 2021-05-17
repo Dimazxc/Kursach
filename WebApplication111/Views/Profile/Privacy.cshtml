@@ -211,7 +211,10 @@
 
     window.onload = function () {
         dropimage('dropzoneCompany');
-        userBonuses.forEach(b => sendBonus(mode, b.Id, b.Bonus.Title, b.Bonus.Price, b.Bonus.Company.Name));
+        userBonuses.forEach(b => {
+            newBonus = { Id: b.Id, Title: b.Bonus.Title, Price: b.Bonus.Price, cmpTitle: b.Bonus.Company.Name };
+            sendBonus(mode, newBonus)
+        });
         $.get('/Company/ParseCompaniesTags', {}, function (parsedTags) {
             Array.prototype.push.apply(tagify.settings.whitelist, parsedTags);
         });

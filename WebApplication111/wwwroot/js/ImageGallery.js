@@ -1,10 +1,10 @@
 ﻿class Photo {
-    constructor(id, imageUrl, title, mode) {
+    constructor(newPhoto, mode) {
         this.pcontainer = document.getElementById('photosContainer');
-        this.mainDiv = createDiv('').addClass('carousel-item').id(id).parent(this.pcontainer);
-        this.image = createImg(imageUrl).parent(this.mainDiv);
+        this.mainDiv = createDiv('').addClass('carousel-item').id(newPhoto.Id).parent(this.pcontainer);
+        this.image = createImg(newPhoto.ImageUrl).parent(this.mainDiv);
         this.toolDiv = createDiv('').addClass('carousel-caption').parent(this.mainDiv);
-        this.title = createElement('h3').html(title).parent(this.toolDiv);
+        this.title = createElement('h3').html(newPhoto.Title).parent(this.toolDiv);
         if (mode == Bonus_Types.Edit) this.edittools();
     }
 
@@ -21,15 +21,14 @@
             success: () => {
                 this.mainDiv.remove();
                 var photos = selectAll('.carousel-item');
-                console.log(photos)
                 if (photos.length > 0) photos[0].elt.className = 'carousel-item active';
             }
         })
     }
 }
 
-function sendPhoto(id, imageUrl, title, mode) {
-    var photo = new Photo(id, imageUrl, title, mode)
+function sendPhoto(newPhoto, mode) {
+    var photo = new Photo(newPhoto, mode)
 }
 
 function setup() {

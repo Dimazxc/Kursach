@@ -4,16 +4,16 @@
 var activeState = 'pressed';
 
 class Comment {
-    constructor(id, title, content, likes, dislikes) {
-        this.id = id;
+    constructor(newComment) {
+        this.id = newComment.Id;
         this.comcontainer = document.getElementById('commentsContainer');
-        this.mainDiv = createDiv('').addClass('card mb-3').attribute('style', 'width: 640px').id(commentIdHelper + id).parent(this.comcontainer);
+        this.mainDiv = createDiv('').addClass('card mb-3').attribute('style', 'width: 640px').id(commentIdHelper + newComment.Id).parent(this.comcontainer);
         this.row = createDiv('').addClass('row g-0').parent(this.mainDiv);
         this.col = createDiv('').addClass('col-md-12 mt-1').parent(this.row);
         this.cardbody = createDiv('').addClass('card-body').parent(this.col);
-        this.title = createElement('h2').addClass('companyTitle').html(title).parent(this.cardbody);
-        this.content = createElement('p').html(content).addClass('companyText notranslate').parent(this.cardbody);
-        this.tools(likes, dislikes);
+        this.title = createElement('h2').addClass('companyTitle').html(newComment.Title).parent(this.cardbody);
+        this.content = createElement('p').html(newComment.Content).addClass('companyText notranslate').parent(this.cardbody);
+        this.tools(newComment.Likes, newComment.Dislikes);
         this.subscribeEvents();
     }
 
@@ -50,7 +50,8 @@ class Comment {
     changecommentrating(divSend, divRemove, rateState, icon, iconRemove) {
         if (curruser == null) $('#logregmodal').modal();
             else {
-            this.generateRate(), this.comRate.islike = rateState;
+            this.generateRate(),
+            this.comRate.islike = rateState;
             if (!divSend.class().includes(activeState)) {
                 $.post('/CommentRating/AddCommentRating', { 'commentRating': this.comRate, 'commentId': this.id, 'userId': curruser.id }, function () { });
                 if (divRemove.class().includes(activeState)) iconRemove.html(parseInt(iconRemove.html()) - 1);
@@ -68,6 +69,6 @@ class Comment {
 }
 
 
-function sendComment(id, title, content, likes, dislikes) {
-    let comment = new Comment(id, title, content, likes, dislikes);
+function sendComment(newComment) {
+    let comment = new Comment(newComment);
 }

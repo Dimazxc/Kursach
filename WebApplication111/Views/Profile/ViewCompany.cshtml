@@ -210,9 +210,9 @@
         dropimage('dropzoneCompany');
         dropimage('dropzoneNews');
         dropimage('dropzonePhoto');
-        bonuses.forEach(b => sendBonus(mode, b.Id, b.Title, b.Price));
-        news.forEach(n => sendNews(n.Id, n.Title, n.Content, n.ImageUrl, mode))
-        photos.forEach(p => sendPhoto(p.Id, p.ImageUrl, p.Title, mode))
+        bonuses.forEach(b => sendBonus(mode, b));
+        news.forEach(n => sendNews(n, mode))
+        photos.forEach(p => sendPhoto(p, mode))
     };
 
     var newsform = $(".News");
@@ -269,11 +269,12 @@
     $('#createBonus').on('click', function () {
         if (bonusform.valid()) {
             var newBonus = {
-                title: select('#bonusTitle').elt.value,
-                price: select('#bonusPrice').elt.value,
+                Title: select('#bonusTitle').elt.value,
+                Price: select('#bonusPrice').elt.value,
             }
             $.post('/Bonus/AddBonus', { 'bonus': newBonus, 'companyId': '@Model.Id' }, function (id) {
-                sendBonus(mode, id, newBonus.title, newBonus.price)
+                newBonus.Id = id;
+                sendBonus(mode, newBonus)
                 $("#modalBonus").modal('hide')
                 clearModal('Bonus');
             });
@@ -284,12 +285,12 @@
     $('#updateBonus').on('click', function () {
         if (bonusform.valid()) {
             var updateBonus = {
-                id: select('.bns-m-title').id(),
-                title: select('#bonusTitle').elt.value,
-                price: select('#bonusPrice').elt.value,
+                Id: select('.bns-m-title').id(),
+                Title: select('#bonusTitle').elt.value,
+                Price: select('#bonusPrice').elt.value,
             }
             $.post('/Bonus/UpdateBonus', { 'bonus': updateBonus, 'companyId': '@Model.Id' }, function (response) {
-                var id = Number(updateBonus.id);
+                var id = Number(updateBonus.Id);
                 if (response) bonusMap.get(id).editField(updateBonus);
                 else kendo.alert('This bonus bought! Failed operation!')
                 $("#modalBonus").modal('hide')
@@ -301,13 +302,13 @@
     $('#createNews').on('click', function () {
         if (newsform.valid()) {
             var newNews = {
-                id: window.URL.createObjectURL(new Blob([])).substring(31),
-                title: select('#newsTitle').elt.value,
-                imageurl: select('#newsImage').elt.src,
-                content: select('#newsContent').elt.value,
+                Id: window.URL.createObjectURL(new Blob([])).substring(31),
+                Title: select('#newsTitle').elt.value,
+                ImageUrl: select('#newsImage').elt.src,
+                Content: select('#newsContent').elt.value,
             }
             $.post('/News/AddNews', { 'news': newNews, 'companyId': '@Model.Id' }, function () {
-                sendNews(newNews.id, newNews.title, newNews.content, newNews.imageurl, mode)
+                sendNews(newNews, mode)
                 $("#modalNews").modal('hide')
                 clearModal('News');
             });
@@ -317,13 +318,13 @@
     $('#updateNews').on('click', function () {
         if (newsform.valid()) {
             var updateNews = {
-                id: select('.nws-m-title').id(),
-                title: select('#newsTitle').elt.value,
-                imageurl: select('#newsImage').elt.src,
-                content: select('#newsContent').elt.value,
+                Id: select('.nws-m-title').id(),
+                Title: select('#newsTitle').elt.value,
+                ImageUrl: select('#newsImage').elt.src,
+                Content: select('#newsContent').elt.value,
             }
             $.post('/News/UpdateNews', { 'news': updateNews, 'companyId': '@Model.Id' }, function () {
-                newsmap.get(updateNews.id).editField(updateNews);
+                newsmap.get(updateNews.Id).editField(updateNews);
                 $("#modalNews").modal('hide')
                 clearModal('News');
             });
@@ -334,12 +335,12 @@
     $('#createPhoto').on('click', function () {
         if (photoform.valid()) {
             var newPhoto = {
-                id: window.URL.createObjectURL(new Blob([])).substring(31),
-                imageurl: select('#photoImage').elt.src,
-                title: select('#photoTitle').elt.value,
+                Id: window.URL.createObjectURL(new Blob([])).substring(31),
+                ImageUrl: select('#photoImage').elt.src,
+                Title: select('#photoTitle').elt.value,
             }
             $.post('/Gallery/AddPhoto', { 'photo': newPhoto, 'companyId': '@Model.Id' }, function () {
-                sendPhoto(newPhoto.id, newPhoto.imageurl, newPhoto.title, mode);
+                sendPhoto(newPhoto, mode);
                 $("#modalPhoto").modal('hide')
                 clearModal('Photo');
             });

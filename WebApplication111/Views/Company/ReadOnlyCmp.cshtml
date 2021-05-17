@@ -266,10 +266,10 @@
             }
         });
 
-        bonuses.forEach(b => sendBonus(mode, b.Id, b.Title, b.Price));
-        news.forEach(n => sendNews(n.Id, n.Title, n.Content, n.ImageUrl, mode))
-        photos.forEach(p => sendPhoto(p.Id, p.ImageUrl, p.Title, mode))
-        comments.forEach(c => sendComment(c.Id, c.Title, c.Content, c.Likes, c.Dislikes))
+        bonuses.forEach(b => sendBonus(mode, b));
+        news.forEach(n => sendNews(n, mode))
+        photos.forEach(p => sendPhoto(p, mode))
+        comments.forEach(c => sendComment(c))
     };
 
     $(document).ready(function () {
@@ -359,7 +359,8 @@
                 }
                 $.post('/Comment/AddComment', { 'comment': newComment, 'companyId': cmpId }, function (id) {
                     hubConnection.invoke("SendComment", newComment, cmpId);
-                    sendComment(id, newComment.Title, newComment.Content, newComment.Likes, newComment.Dislikes);
+                    newComment.Id = id;
+                    sendComment(newComment);
                     select('#commentBox').elt.value = '';
                 });
             }
@@ -398,7 +399,7 @@
     }
 
     hubConnection.on("ApplyComment", function (newComment) {
-        sendComment(newComment.id, newComment.title, newComment.content, newComment.likes, newComment.dislikes)
+        sendComment(newComment)
     });
 
     hubConnection.start().then(() => {

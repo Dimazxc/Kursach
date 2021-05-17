@@ -24,8 +24,8 @@ class Bonus {
 
 
 class EditBonus extends Bonus {
-    constructor(id, title, price) {
-        super(id, title, price);
+    constructor(newBonus) {
+        super(newBonus.Id, newBonus.Title, newBonus.Price);
         this.editbtn = createButton('Edit').addClass('editbtn btn-warning').parent(this.tooldiv);
         this.delbtn = createButton('Delete').addClass('delbtn btn-danger').parent(this.tooldiv);
         this.delbtn.elt.addEventListener('click', () => this.deteleBonus(), false);
@@ -49,14 +49,14 @@ class EditBonus extends Bonus {
     }
 
     editField(bonus) {
-        this.title.elt.innerHTML =bonus.title;
-        this.priceHtml.elt.innerHTML =bonus.price;
+        this.title.elt.innerHTML = bonus.Title;
+        this.priceHtml.elt.innerHTML =bonus.Price;
     }
 }
 
 class ReadOnlyBonus extends Bonus {
-    constructor(id, title, price) {
-        super(id, title, price);
+    constructor(newBonus) {
+        super(newBonus.Id, newBonus.Title, newBonus.Price);
         this.donatebtn = createButton('Donate').addClass('btn btn-warning').parent(this.tooldiv);
         this.donatebtn.elt.addEventListener('click', () => this.donate(), false)
     }
@@ -73,26 +73,26 @@ class ReadOnlyBonus extends Bonus {
 }
 
 class UserBonus extends Bonus {
-    constructor(id, title, price, cmpTitle) {
-        super(id, title, price);
-        this.cmpTitle = createElement('h5').addClass('notranslate').html('Company: ' + cmpTitle).parent(this.tooldiv);
+    constructor(newBonus) {
+        super(newBonus.Id, newBonus.Title, newBonus.Price);
+        this.cmpTitle = createElement('h5').addClass('notranslate').html('Company: ' + newBonus.cmpTitle).parent(this.tooldiv);
     }
 }
 
 
-function sendBonus(mode, id, title, price, cmpTitle) {
+function sendBonus(mode, newBonus) {
     let bonus
     switch (mode) {
         case Bonus_Types.Edit:
-            bonus = new EditBonus(id, title, price)
+            bonus = new EditBonus(newBonus)
             break;
         case Bonus_Types.Read:
-            bonus = new ReadOnlyBonus(id, title, price)
+            bonus = new ReadOnlyBonus(newBonus)
             break;
         case Bonus_Types.User:
-            bonus = new UserBonus(id, title, price, cmpTitle)
+            bonus = new UserBonus(newBonus)
             break;
     }
 
-    bonusMap.set(id, bonus);
+    bonusMap.set(newBonus.Id, bonus);
 }

@@ -40,12 +40,12 @@ class News {
 }
 
 class ImageNews extends News {
-    constructor(id, title, content, imageUrl, mode) {
-        super(id);
+    constructor(newNews) {
+        super(newNews.Id);
         this.imageDiv = createDiv('').addClass('col-md-5 text-center').parent(this.row);
-        this.image = createImg(imageUrl).addClass('newsImg img-responsive rounded product-image').parent(this.imageDiv);
+        this.image = createImg(newNews.ImageUrl).addClass('newsImg img-responsive rounded product-image').parent(this.imageDiv);
         this.col = createDiv('').addClass('col-md-7 mt-1').parent(this.row);
-        this.tall(title, content)
+        this.tall(newNews.Title, newNews.Content);
         if (mode == Bonus_Types.Edit) this.edittool();
     }
 
@@ -57,17 +57,17 @@ class ImageNews extends News {
     }
 
     editField(updateNews) {
-        this.title.elt.innerHTML = updateNews.title;
-        this.content.elt.innerHTML = updateNews.content;
-        this.image.elt.src = updateNews.imageurl;
+        this.title.elt.innerHTML = updateNews.Title;
+        this.content.elt.innerHTML = updateNews.Content;
+        this.image.elt.src = updateNews.ImageUrl;
     }
 }
 
 class TextNews extends News {
-    constructor(id, title, content, mode) {
-        super(id);
+    constructor(newNews) {
+        super(newNews.Id);
         this.col = createDiv('').addClass('col-md-12 mt-1').parent(this.row);
-        this.tall(title, content);
+        this.tall(newNews.Title, newNews.Content);
         if (mode == Bonus_Types.Edit) this.edittool();
     }
 
@@ -78,16 +78,16 @@ class TextNews extends News {
     }
 
     editField(updateNews) {
-        this.title.elt.innerHTML = updateNews.title;
-        this.content.elt.innerHTML = updateNews.content;
+        this.title.elt.innerHTML = updateNews.Title;
+        this.content.elt.innerHTML = updateNews.Content;
     }
 }
 
-function sendNews(id, title, content, imageUrl, mode) {
+function sendNews(newNews, mode) {
     let news;
-    if (imageUrl == emtpyUrl) news = new TextNews(id, title, content, mode)
-    else news = new ImageNews(id, title, content, imageUrl, mode)
-    newsmap.set(id, news);
+    if (newNews.ImageUrl == emtpyUrl) news = new TextNews(newNews, mode)
+    else news = new ImageNews(newNews, mode)
+    newsmap.set(newNews.Id, news);
 }
 
 function setup() {
