@@ -625,6 +625,7 @@ h5 {
 #imageCompany {
     height: 350px;
     width: 650px;
+    box-shadow: 0 0 20px rgb(42 159 214);
 }
 
 #buttonDonate {
@@ -636,7 +637,7 @@ h5 {
 
 .tab-content .btn {
     height: 50px;
-    width:  50%;
+    width:  70%;
     font-size: 20px;
     margin-top: 20px;
     margin-bottom: 20px;

@@ -17,7 +17,7 @@ class Bonus {
         this.cardbody = createDiv('').addClass('card-body').parent(this.card);
         this.title = createElement('h2').addClass('card-title notranslate').html(title).parent(this.cardbody);
         this.priceTilte = createElement('h4').html('Price: $').parent(this.cardbody).attribute("style", "display: inline;");
-        this.priceHtml = createElement('h4').addClass('card-price').html(price).attribute("style", "display: inline;").parent(this.cardbody);
+        this.priceHtml = createElement('h4').addClass('card-price notranslate').html(price).attribute("style", "display: inline;").parent(this.cardbody);
         this.tooldiv = createDiv('').addClass('card-footer text-center').parent(this.card);      
     }
 }

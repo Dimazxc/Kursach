@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Korzh.EasyQuery.Linq;
 using WebApplication111.Data;
 using Microsoft.EntityFrameworkCore;
+using WebApplication111.Models;
 
 namespace WebApplication111.Controllers
 {
@@ -23,7 +23,7 @@ namespace WebApplication111.Controllers
         }
 
         [HttpPost]
-        public void AddNews(News news, string companyId)
+        public void AddNews(News news, int companyId)
         {
             UpdateNewsCompany(news, companyId);
             news.Date = DateTime.Now;
@@ -32,7 +32,7 @@ namespace WebApplication111.Controllers
         }
 
         [HttpPost]
-        public void UpdateNews(News news, string companyId)
+        public void UpdateNews(News news, int companyId)
         {
             UpdateNewsCompany(news, companyId);
             news.Date = DateTime.Now;
@@ -40,7 +40,7 @@ namespace WebApplication111.Controllers
             context.SaveChanges();
         }
 
-        private void UpdateNewsCompany(News news, string companyId)
+        private void UpdateNewsCompany(News news, int companyId)
         {
             news.Company = context.Companies.Find(companyId);
             news.Company.UpdatedDay = DateTime.Now;

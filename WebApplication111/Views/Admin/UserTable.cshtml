@@ -2,6 +2,7 @@
 @using Newtonsoft.Json;
 @using Microsoft.EntityFrameworkCore;
 @using WebApplication111.Data;
+@using WebApplication111.Models;
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 @inject ApplicationDbContext DbContext;
@@ -50,10 +51,10 @@
         $("#usergrid").kendoGrid({
             columns: [
                 { selectable: true, width: "50px" },
-                { field: "userName", title: "Name", width: 180 },
-                { field: "email", title: "E-mail", width: 180 },
-                { field: "phoneNumber", title: "Phone", width: 180 },
-                { field: "lockoutEnabled", title: "Ublock", width: 180 },
+                { field: "userName", title: "Name", width: 180, attributes: { class: 'notranslate' } },
+                { field: "email", title: "E-mail", width: 180, attributes: { class: 'notranslate' } },
+                { field: "phoneNumber", title: "Phone", width: 180, attributes: { class: 'notranslate' } },
+                { field: "lockoutEnabled", title: "Block", width: 180, attributes: { class: 'notranslate' } },
                 { command: { text: "View company", click: getUserCompany }, width: 80 },
             ],
             height: 500,
@@ -67,7 +68,6 @@
             filterable: true,
         });
     });
-
 
     function deleteUsers() {
         $.post('/Admin/DeleteUsers', { '': getSelected()}, (response) => {
@@ -103,8 +103,6 @@
         window.location.href = url;
     };
 
-
-
     function getSelected() {
         var grid = $("#usergrid").data("kendoGrid");
         var selected = [];
@@ -114,8 +112,6 @@
         grid.clearSelection();
         return selected;
     }
-
-
 </script>
 
 

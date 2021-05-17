@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebApplication111.Data;
 using Microsoft.EntityFrameworkCore;
+using WebApplication111.Models;
 
 namespace WebApplication111.Controllers
 {
@@ -18,9 +19,10 @@ namespace WebApplication111.Controllers
             this.context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> ReadOnlyCmp(int id)
         {
-            return View();
+            var company = await context.Companies.FindAsync(id);
+            return View(company);
         }
 
         public JsonResult GetCompanies(string userId)
@@ -36,7 +38,7 @@ namespace WebApplication111.Controllers
             context.SaveChanges();
         }
 
-        public void DeleteCompany(string id)
+        public void DeleteCompany(int id)
         {
             var deleteCompany = context.Companies.Include(i => i.Bonuses).Include(i => i.Gallery).Include(i => i.News).
                 Include(i => i.Ratings).Include(i => i.Comments).First(i => i.Id == id);
@@ -54,7 +56,7 @@ namespace WebApplication111.Controllers
             context.SaveChanges();
         }
 
-        public void UpdateDescription(string companyId, string newDescription, string imageUrl)
+        public void UpdateDescription(int companyId, string newDescription, string imageUrl)
         {
             var company = context.Companies.Find(companyId);
             company.UpdatedDay = DateTime.Now;
@@ -63,13 +65,13 @@ namespace WebApplication111.Controllers
             context.SaveChanges();
         }
 
-        public JsonResult AddDonateCompany(string companyId, float donateSum)
+        public JsonResult AddDonateCompany(int companyId, float donateSum)
         {
             var company = context.Companies.Find(companyId);
             return UpdateCompanyBalance(company, donateSum);
         }
 
-        public JsonResult AddUserBonus(UserBonus userBonus, string bonusId)
+        public JsonResult AddUserBonus(UserBonus userBonus, int bonusId)
         {
             var bonus = context.Bonuses.Include(i => i.Company).FirstOrDefault(i => i.Id == bonusId);
             userBonus.Bonus = bonus;

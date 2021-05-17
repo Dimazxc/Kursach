@@ -2,6 +2,7 @@
 @using Newtonsoft.Json;
 @using Microsoft.EntityFrameworkCore;
 @using WebApplication111.Data;
+@using WebApplication111.Models;
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 @inject ApplicationDbContext DbContext;
@@ -9,10 +10,10 @@
 
 @{
     var user = UserManager.GetUserAsync(User).GetAwaiter().GetResult();
-    ViewData["Title"] = "Privacy Policy";
+    ViewData["Title"] = "Profile";
     var companies = DbContext.Companies.Where(i => i.UserId == user.Id);
     string json = JsonConvert.SerializeObject(companies, Formatting.Indented);
-    string jsonUserBonuses = JsonConvert.SerializeObject(DbContext.UsersBonuses.Include(i => i.Bonus).Where(i => i.UserId == user.Id), Formatting.Indented, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, ContractResolver = new IncludeIgnored(true) });
+    string jsonUserBonuses = JsonConvert.SerializeObject(DbContext.UsersBonuses.Include(i => i.Bonus).ThenInclude(i => i.Company).Where(i => i.UserId == user.Id), Formatting.Indented, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, ContractResolver = new IncludeIgnored(true) });
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -23,9 +24,9 @@
                 <div class="card">
                     <div class="card-body text-center bg-primary rounded-top">
                         <div class="user-box">
-                            <img src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="user avatar">
+                            <img src="https://techcommunity.microsoft.com/t5/image/serverpage/image-id/217078i525F6A9EF292601F/image-size/large?v=v2&px=999" alt="user avatar">
                         </div>
-                        <h5 class="mb-1 text-white">@user.UserName</h5>
+                        <h5 class="mb-1 text-white notranslate">@Model.UserName</h5>
                     </div>
                     <div class="card-body">
                         <ul class="list-group shadow-none">
@@ -34,7 +35,7 @@
                                     <i class="fa fa-phone-square"></i>
                                 </div>
                                 <div class="list-details">
-                                    <span>@user.PhoneNumber</span>
+                                    <span class="notranslate">@Model.PhoneNumber</span>
                                     <small>Mobile Number</small>
                                 </div>
                             </li>
@@ -43,7 +44,7 @@
                                     <i class="fa fa-envelope"></i>
                                 </div>
                                 <div class="list-details">
-                                    <span>@user.Email</span>
+                                    <span class="notranslate">@Model.Email</span>
                                     <small>Email Address</small>
                                 </div>
                             </li>
@@ -98,28 +99,27 @@
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Name</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" asp-for="UserName" type="text" value="@user.UserName">
-                                        <span asp-validation-for="UserName" class="text-danger"></span>
+                                        <input class="form-control" asp-for="UserName" type="text" value="@Model.UserName" required  oninvalid="setCustomValidity('!!!!')"  oninput="setCustomValidity('')">             
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Email</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="email" asp-for="Email" value="@user.Email">
+                                        <input class="form-control" type="email" asp-for="Email" value="@Model.Email" required oninvalid="setCustomValidity('!!!!')"  oninput="setCustomValidity('')">
                                         <span asp-validation-for="Email" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label">Phone number</label>
                                     <div class="col-lg-9">
-                                        <input class="form-control" type="tel" asp-for="PhoneNumber" value="@user.PhoneNumber">
+                                        <input class="form-control" type="tel" asp-for="PhoneNumber" value="@Model.PhoneNumber">
                                         <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-lg-3 col-form-label form-control-label"></label>
                                     <div class="col-lg-9">
-                                        <input type="submit" class="btn btn-primary" asp-controller="Profile" asp-action="Edit" asp-route-id="@user.Id" value="Save Changes">
+                                        <input type="submit" class="btn btn-primary" asp-controller="Profile" asp-action="Edit" asp-route-id="@Model.Id" value="Save Changes">
                                         <input type="reset" class="btn btn-secondary" asp-controller="Profile" asp-action="CancelEdit" value="Cancel">
                                     </div>
                                 </div>
@@ -148,16 +148,16 @@
                         <img src="https://img.flaticon.com/icons/png/512/1753/1753543.png?size=1200x630f&pad=10,10,10,10&ext=png&bg=FFFFFFFF" id="dropzone" class="dropzoneCompany" alt="Preview Image" width="200" />
                     </div>
                     <div class="form-group row">
-                        <input class="form-control" id="companyName" type="text" value="" placeholder="Company name" required minlength="5" maxlength="15">
+                        <input class="form-control" id="companyName" type="text" value="" placeholder="Company name" required minlength="5" maxlength="40">
                         <div class="valid-feedback">
                             Looks good!
                         </div>
                         <div class="invalid-feedback">
-                            Please choose a valid company name (between 5 and 15 characters).
+                            Please choose a valid company name (between 5 and 40 characters).
                         </div>
                     </div>
                     <div class="form-group">
-                        <input name='tags' id="companyTags" required><div class="valid-feedback">
+                        <input name='tags' id="companyTags" class="notranslate" required><div class="valid-feedback">
                             Looks good!
                         </div>
                         <div class="invalid-feedback">
@@ -202,12 +202,12 @@
 <script src="https://kendo.cdn.telerik.com/2021.1.330/js/kendo.all.min.js"></script>
 <script depends-on="jquery">
 
+    var userId = '@Model.Id';
     var companies =  @Html.Raw(json);
     var userBonuses = @Html.Raw(jsonUserBonuses);
 
     var mode = 'user'
     var tags = []
-    var thems = ["Education", "Electionics", "Science", "Music", "Art", "Game", "Literature"]
 
     window.onload = function () {
         dropimage('dropzoneCompany');
@@ -216,23 +216,6 @@
             Array.prototype.push.apply(tagify.settings.whitelist, parsedTags);
         });
     };
-
-    (() => { 'use strict';
-        const forms = document.querySelectorAll('.modalcreate');
-        Array.prototype.slice.call(forms).forEach((form) => {
-            form.addEventListener('submit', (event) => {
-                if (!form.checkValidity()) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                } else {
-                    event.preventDefault();
-                    createCompany();
-                }
-                form.classList.add('was-validated');
-            }, false);
-        });
-    })();
-
 
     jQuery(document).ready(function () {
         jQuery('a[data-toggle="pill"]').on('show.bs.tab', function (e) {
@@ -244,78 +227,12 @@
         }
     });
 
-
-    $(document).ready(function () {
-
-        $('#companyED').kendoDatePicker({ format: "{0: yyyy-MM-dd}" });
-
-        $("#companyTh").kendoDropDownList({ dataSource: thems });
-
-        var cmp = new kendo.data.DataSource({
-            transport: {
-                read: { url: "/Company/GetCompanies", data: { 'userId': '@user.Id' }, cache: false }
-            }
-        });
-
-        $("#gridcompany").kendoGrid({
-            columns: [
-                { field: "id", hidden: true, 'editable': function () { return false } },
-                { field: "name", width: 100 },
-                { field: "price", width: 100 },
-                { field: "urlVideo", width: 150},
-                { field: "endDay", width: 100, editor: endDayPicker, type: "date", format: "{0: yyyy-MM-dd}" },
-                { field: "theme", width: 100, editor: themeDropDownEditor },
-                { command: "edit", width: 80 },
-                { command: { text: "Delete", click: deletecompany }, width: 80 },
-                { command: { text: "Open read", click: openread }, width: 80 },
-                { command: { text: "Open edit", click: openedit }, width: 80 },
-            ],
-            editable: "popup",
-            dataSource: cmp,
-            pageable: true,
-            sortable: true,
-            navigatable: true,
-            resizable: true,
-            reorderable: true,
-            groupable: true,
-            filterable: true,
-            edit: function (e) {
-                this.one("save", function () {
-                    $.post('/Company/UpdateCompany', { '': JSON.stringify(e.model) }, function () {
-                        $("#gridcompany").data("kendoGrid").dataSource.read();
-                    })
-                });
-                this.one("cancel", function () {
-                    $('#gridcompany').data('kendoGrid').dataSource.cancelChanges();
-                });
-            }
-        });
-    })
-
-    function themeDropDownEditor(container, options) {
-        $('<input required name="' + options.field + '"/>').appendTo(container).kendoDropDownList({ dataSource: thems });
-    }
-
-    function endDayPicker(container, options) {
-        $('<input required name="' + options.field + '"/>').appendTo(container).kendoDatePicker();
-    }
-
-    function deletecompany(e) {
-        var tr = $(e.target).closest("tr");
-        var id = this.dataItem(tr).id;
-        kendo.confirm("Are you sure that you want delete this company?").then(function () {
-            $.post('/Company/DeleteCompany', { '': id }, function () {
-                $("#gridcompany").data("kendoGrid").dataSource.read();
-            });
-        }, function () { });
-    }
-
     $('[data-dismiss=modal]').on('click', function (e) {
         clearModal();
     })
 
     function openread(e) {
-        var url = '@Url.Action("ReadOnlyCmp", "Profile")' + '?id=' + this.dataItem($(e.target).closest("tr")).id;
+        var url = '@Url.Action("ReadOnlyCmp", "Company")' + '?id=' + this.dataItem($(e.target).closest("tr")).id;
         window.location.href = url;
     }
 
@@ -323,34 +240,9 @@
         var url = '@Url.Action("ViewCompany", "Profile")' + '?id=' + this.dataItem($(e.target).closest("tr")).id;
         window.location.href = url;
     }
-
-    createCompany = function() {
-        var newCompany = {
-            id: window.URL.createObjectURL(new Blob([])).substring(31),
-            name: select('#companyName').elt.value,
-            urlvideo: select('#companyYT').elt.value,
-            urlimage: select('.dropzoneCompany').elt.src,
-            description: select('#companyDesc').elt.value,
-            price: select('#companyPrice').elt.value,
-            userId: '@user.Id',
-            tags: configureTags(),
-            theme: select('#companyTh').elt.value,
-            endDay: select('#companyED').elt.value
-        }
-        $.post('/Company/AddCompany', { '': newCompany }, function () {
-            $("#gridcompany").data("kendoGrid").dataSource.read();
-            clearModal();
-            $("#staticBackdrop").modal('hide')
-        })
-    }
-
-    clearModal = function () {
-        $('.tagify').children('.tagify__tag').remove()
-        document.getElementById('dropzone').src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFLS0UEwpcXzZGU1PgVHnrr2cujesChZtnsw&usqp=CAU'
-        $('.modalcreate').children('.form-group ').children('.form-control').val('');
-    }
-
 </script>
+
+<script src="~/js/CompanyGrid.js"></script>
 <script src="~/js/Company.js"></script>
 <script src="~/js/TagsCreate.js"></script>
 <script src="~/js/imageloader.js"></script>

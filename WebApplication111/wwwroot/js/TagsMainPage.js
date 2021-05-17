@@ -7,7 +7,7 @@ var tagify = new Tagify(input, {
     maxTags: 100,
     dropdown: {
         maxItems: 100,
-        classname: "tags-look",
+        classname: "tags-look notranslate",
         enabled: 0,
         closeOnSelect: false
     }

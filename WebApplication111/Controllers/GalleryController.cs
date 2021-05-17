@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication111.Data;
+using WebApplication111.Models;
 
 namespace WebApplication111.Controllers
 {
@@ -20,7 +21,7 @@ namespace WebApplication111.Controllers
         }
 
         [HttpPost]
-        public void AddPhoto(Photo photo, string companyId)
+        public void AddPhoto(Photo photo, int companyId)
         {
             photo.Company = context.Companies.Find(companyId);
             photo.Company.UpdatedDay = DateTime.Now;

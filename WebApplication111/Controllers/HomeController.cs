@@ -22,7 +22,7 @@ namespace WebApplication111.Controllers
     {
         private readonly UserManager<IdentityUser> userManager;
         private readonly ApplicationDbContext context;
-        public HomeController(ILogger<HomeController> logger, UserManager<IdentityUser> userManager, ApplicationDbContext context)
+        public HomeController(UserManager<IdentityUser> userManager, ApplicationDbContext context)
         {
             this.userManager = userManager;
             this.context = context;
@@ -33,10 +33,8 @@ namespace WebApplication111.Controllers
             return View();
         }
 
-        public JsonResult SearchCompany(string information)
+        public JsonResult SearchCompany(string searchTerm)
         {
-            FtsQuery ftsQuery = new FtsQuery(true);
-            string searchTerm = ftsQuery.Transform(information);
             var cmp = context.Companies.Where(i => EF.Functions.Contains(i.Name, searchTerm) || EF.Functions.Contains(i.Description, searchTerm));
             var news = context.News.Include(i => i.Company).Where(i => EF.Functions.Contains(i.Content, searchTerm) || EF.Functions.Contains(i.Title, searchTerm)).Select(i => i.Company);
             var bonuses = context.Bonuses.Include(i => i.Company).Where(i => EF.Functions.Contains(i.Title, searchTerm)).Select(i => i.Company);

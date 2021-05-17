@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication111.Data;
+using WebApplication111.Models;
 
 namespace WebApplication111.Controllers
 {
@@ -22,7 +23,7 @@ namespace WebApplication111.Controllers
             return View();
         }
 
-        public void AddCommentRating(CommentRating commentRating, string commentId)
+        public void AddCommentRating(CommentRating commentRating, int commentId)
         {
             var comment = context.Comments.Include(r => r.Company).FirstOrDefault(r => r.Id == commentId);
             var rating = context.CommentRatings.AsNoTracking().FirstOrDefault(r => r.UserId == commentRating.UserId && r.Comment.Id == commentId);
@@ -37,7 +38,7 @@ namespace WebApplication111.Controllers
             UpdateRatingCount(comment, context.CommentRatings.Include(r => r.Comment).Where(i => i.Comment.Id == comment.Id).ToList());
         }
 
-        public void RemoveCommentRating(string userId, string commentId)
+        public void RemoveCommentRating(string userId, int commentId)
         {
             var commentRating = context.CommentRatings.Include(r => r.Comment).FirstOrDefault(r => r.UserId == userId && r.Comment.Id == commentId);
             context.CommentRatings.Remove(commentRating);
@@ -52,7 +53,7 @@ namespace WebApplication111.Controllers
             context.SaveChanges();
         }
         
-        public JsonResult GetUserCommentRatings(string userId, string companyId)
+        public JsonResult GetUserCommentRatings(string userId, int companyId)
         {
             var userCommentRatings = context.CommentRatings.Include(r => r.Comment).Where(i => i.UserId == userId && i.Comment.Company.Id == companyId);
             return Json(userCommentRatings);

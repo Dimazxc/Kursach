@@ -5,22 +5,39 @@ $(document).ready(function () {
 
     var cmp = new kendo.data.DataSource({
         transport: {
-            read: { url: "/Company/GetCompanies", data: { 'userId': user.id }, cache: false }
+            read: { url: "/Company/GetCompanies", data: { 'userId': userId }, cache: false },
+            update: { url: "/Company/GetCompanies", data: { 'userId': userId }, cache: false }
+        },
+        schema: {
+            model: {
+                id: "id",
+                fields: {
+                    price: {
+                        type: "number",
+                        validation: {
+                            required: true,
+                            min: 1
+                        }
+                    },
+                    name: { validation: { required: true } },
+                    urlVideo: { validation: { required: true } },
+                    endDay: { validation: { required: true } },
+                }
+            }
         }
     });
-
-    $('#companyED').kendoDatePicker({ format: "{0: yyyy-MM-dd}" });
+     $('#companyED').kendoDatePicker({ format: "{0: yyyy-MM-dd}",  min: new Date() });
 
     $("#companyTh").kendoDropDownList({ dataSource: thems });
 
     $("#gridcompany").kendoGrid({
         columns: [
             { field: "id", hidden: true, 'editable': function () { return false } },
-            { field: "name", width: 100 },
-            { field: "price", width: 100 },
-            { field: "urlVideo", width: 150 },
-            { field: "endDay", width: 100, editor: endDayPicker, type: "date", format: "{0: yyyy-MM-dd}" },
-            { field: "theme", width: 100, editor: themeDropDownEditor },
+            { field: "name", title: "Name", width: 100, attributes: { class: 'notranslate' } },
+            { field: "price", title: "Price", width: 100 },
+            { field: "urlVideo", title: "Video url", width: 150, attributes: { class: 'notranslate' } },
+            { field: "endDay", title: "Day of the end", width: 100, editor: endDayPicker, type: "date", format: "{0: yyyy-MM-dd}" },
+            { field: "theme", title: "Theme", width: 100, editor: themeDropDownEditor },
             { command: "edit", width: 80 },
             { command: { text: "Delete", click: deletecompany }, width: 80 },
             { command: { text: "Open read", click: openread }, width: 80 },
@@ -52,7 +69,7 @@ function themeDropDownEditor(container, options) {
 }
 
 function endDayPicker(container, options) {
-    $('<input required name="' + options.field + '"/>').appendTo(container).kendoDatePicker();
+    $('<input required name="' + options.field + '"/>').appendTo(container).kendoDatePicker({ min: new Date() });
 }
 
 $('[data-dismiss=modal]').on('click', function (e) {
@@ -67,7 +84,7 @@ createCompany = function () {
         urlimage: select('.dropzoneCompany').elt.src,
         description: select('#companyDesc').elt.value,
         price: select('#companyPrice').elt.value,
-        userId: user.id,
+        userId: userId,
         tags: configureTags(),
         theme: select('#companyTh').elt.value,
         endDay: select('#companyED').elt.value

@@ -2,6 +2,7 @@
 @using Newtonsoft.Json;
 @using Microsoft.EntityFrameworkCore;
 @using WebApplication111.Data;
+@using WebApplication111.Models;
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 @inject ApplicationDbContext DbContext
@@ -15,7 +16,7 @@
 <div class="tab-content p-3">
     <div class="col-sm-auto text-center">
         <div class="input-group-prepend">
-            <h4 class="mb-2">Companies of: USERNAME</h4>
+            <h4 class="mb-2">Companies of: @Model.Email</h4>
         </div>
         <button type="button" class="btn btn-success" data-toggle="modal" data-target="#staticBackdrop">Add Company</button>
     </div>
@@ -54,7 +55,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <input name='tags' id="companyTags" required><div class="valid-feedback">
+                        <input name='tags' id="companyTags" class="notranslate" required><div class="valid-feedback">
                             Looks good!
                         </div>
                         <div class="invalid-feedback">
@@ -98,7 +99,7 @@
 <script src="https://kendo.cdn.telerik.com/2019.2.619/js/jquery.min.js"></script>
 <script src="https://kendo.cdn.telerik.com/2021.1.330/js/kendo.all.min.js"></script>
 <script>
-    var user = @Html.Raw(Json.Serialize(Model));
+    var userId = '@Model.Id';
     window.onload = function () {
         dropimage('dropzoneCompany');
         $.get('/Company/ParseCompaniesTags', {}, function (parsedTags) {
@@ -107,7 +108,7 @@
     };
 
     function openread(e) {
-        var url = '@Url.Action("ReadOnlyCmp", "Profile")' + '?id=' + this.dataItem($(e.target).closest("tr")).id;
+        var url = '@Url.Action("ReadOnlyCmp", "Company")' + '?id=' + this.dataItem($(e.target).closest("tr")).id;
         window.location.href = url;
     }
 

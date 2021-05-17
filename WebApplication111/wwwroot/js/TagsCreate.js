@@ -13,6 +13,7 @@ var input = document.querySelector('input[name=tags]'),
         backspace: "edit",
         placeholder: "Type something",
         dropdown: {
+            classname: "notranslate",
             enabled: 1,
             fuzzySearch: false,
             position: 'text',

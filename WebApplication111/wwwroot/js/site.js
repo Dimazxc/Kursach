@@ -37,3 +37,9 @@ function disableDarkTheme() {
     DARK_STYLE_LINK.setAttribute("href", "");
     THEME_TOGGLER.innerHTML = "🌞 Light";
 }
+
+function createID() {
+    return Math.floor(Math.random() * 10000000);
+}
+
+const hrefToCmp = '/Company/ReadOnlyCmp?id='

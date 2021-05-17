@@ -12,7 +12,7 @@ class News {
     tall(title, content) {
         this.cardbody = createDiv('').addClass('card-body').parent(this.col);
         this.title = createElement('h3').addClass('companyTitle notranslate').attribute('disabled', 'disabled').html(title).parent(this.cardbody);
-        this.content = createElement('p').html(content).addClass('companyText').attribute('disabled', 'disabled').parent(this.cardbody);
+        this.content = createElement('p').html(content).addClass('companyText notranslate').attribute('disabled', 'disabled').parent(this.cardbody);
         this.butGroup = createDiv().addClass('btn-group float-right').attribute('role', 'group').parent(this.cardbody);
     }
 
@@ -68,7 +68,6 @@ class TextNews extends News {
         super(id);
         this.col = createDiv('').addClass('col-md-12 mt-1').parent(this.row);
         this.tall(title, content);
-        console.log(mode)
         if (mode == Bonus_Types.Edit) this.edittool();
     }
 

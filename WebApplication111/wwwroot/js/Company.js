@@ -6,7 +6,7 @@ class Company {
         let container = select('#' + containerId);
         this.mainDiv = createDiv('').addClass('col-md-4 mb-5').parent(container).id(cmp.Id).attribute('style', 'cursor:pointer');
         this.mainDiv.elt.addEventListener('click', () => {
-            var url = '/Profile/ReadOnlyCmp' + '?id=' + this.mainDiv.elt.id;
+            var url = hrefToCmp + this.mainDiv.elt.id;
             window.location.href = url;
         }, false);
         this.cardDiv = createDiv('').addClass('card h-100').parent(this.mainDiv);
@@ -18,13 +18,13 @@ class Company {
     }
 
     fillcardbody(theme, title, description) {
-        this.theme = createElement('h6').addClass('notranslate').html(theme).parent(this.cardBody);
+        this.theme = createElement('h6').html(theme).parent(this.cardBody);
         this.cardTitle = createElement('h4').addClass('card-title notranslate').html(title).parent(this.cardBody);
         this.cardText = createElement('h5').addClass('card-text notranslate').html(description).attribute('style', 'font-size:17px').parent(this.cardBody);
     }
 
     fillfooter(avgrate) {
-        var id = window.URL.createObjectURL(new Blob([])).substring(31)
+        var id = createID();
         this.rating = createInput('').parent(this.cardFooter).id(id);
         var ratingInstance =  $("#" + id).kendoRating({ value: avgrate }).data("kendoRating");
         ratingInstance.readonly(true);
@@ -41,7 +41,6 @@ function sendCompany(containerId, cmp, avgrate) {
 
 
 configureTags = function () {
-    console.log(document.getElementById("companyTags").value)
     var list = JSON.parse(document.getElementById("companyTags").value);
     var tags = "";
     list.forEach(element => (tags += element.value + ";"));

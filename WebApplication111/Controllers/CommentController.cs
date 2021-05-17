@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebApplication111.Controllers.SignalRHub;
 using WebApplication111.Data;
+using WebApplication111.Models;
 
 namespace WebApplication111.Controllers
 {
@@ -26,17 +27,13 @@ namespace WebApplication111.Controllers
 
 
         [HttpPost]
-        public void AddComment(Comment comment, string companyId)
+        public IActionResult AddComment(Comment comment, int companyId)
         {
             comment.Company = context.Companies.Find(companyId);
             context.Comments.Add(comment);
             context.SaveChanges();
-        }
 
-        public JsonResult GetCompanyComment(string companyId)
-        {
-            var comments = context.Companies.ToList();
-            return Json(comments);
+            return Ok(comment.Id);
         }
     }
 }

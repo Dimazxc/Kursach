@@ -2,6 +2,7 @@
 @using WebApplication111.Data;
 @using Newtonsoft.Json;
 @using Microsoft.EntityFrameworkCore;
+@using WebApplication111.Models;
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 @inject ApplicationDbContext DbContext;
@@ -10,10 +11,10 @@
 @{
     var user = UserManager.GetUserAsync(User).GetAwaiter().GetResult();
     var jsonBonuses = JsonConvert.SerializeObject(DbContext.Bonuses.Include(i => i.Company).Where(i => i.Company.Id == Model.Id), Formatting.Indented);
-    var jsonNews = JsonConvert.SerializeObject(DbContext.News.Include(i => i.Company).Where(i => i.Company.Id == Model.Id), Formatting.Indented);
+    var jsonNews = JsonConvert.SerializeObject(DbContext.News.Include(i => i.Company).Where(i => i.Company.Id == Model.Id).OrderByDescending(i => i.Date), Formatting.Indented);
     var jsonGalery = JsonConvert.SerializeObject(DbContext.Galery.Include(i => i.Company).Where(i => i.Company.Id == Model.Id), Formatting.Indented);
 
-    ViewData["Title"] = "";
+    ViewData["Title"] = "Edit Company";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -23,7 +24,7 @@
             <img id="imageCompany" class="img-fluid rounded mb-4 mb-lg-0 dropzoneCompany" src="@Model.UrlImage" alt="">
         </div>
         <div class="col-lg-4">
-            <h2 class="font-weight-light">@Model.Name</h2>
+            <h2 class="font-weight-light notranslate">@Model.Name</h2>
         </div>
     </div>
 
@@ -268,12 +269,11 @@
     $('#createBonus').on('click', function () {
         if (bonusform.valid()) {
             var newBonus = {
-                id: window.URL.createObjectURL(new Blob([])).substring(31),
                 title: select('#bonusTitle').elt.value,
                 price: select('#bonusPrice').elt.value,
             }
-            $.post('/Bonus/AddBonus', { 'bonus': newBonus, 'companyId': '@Model.Id' }, function () {
-                sendBonus(mode, newBonus.id, newBonus.title, newBonus.price)
+            $.post('/Bonus/AddBonus', { 'bonus': newBonus, 'companyId': '@Model.Id' }, function (id) {
+                sendBonus(mode, id, newBonus.title, newBonus.price)
                 $("#modalBonus").modal('hide')
                 clearModal('Bonus');
             });
@@ -289,7 +289,8 @@
                 price: select('#bonusPrice').elt.value,
             }
             $.post('/Bonus/UpdateBonus', { 'bonus': updateBonus, 'companyId': '@Model.Id' }, function (response) {
-                if (response) bonusMap.get(updateBonus.id).editField(updateBonus);
+                var id = Number(updateBonus.id);
+                if (response) bonusMap.get(id).editField(updateBonus);
                 else kendo.alert('This bonus bought! Failed operation!')
                 $("#modalBonus").modal('hide')
                 clearModal('Bonus');

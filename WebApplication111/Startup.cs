@@ -34,9 +34,11 @@ namespace WebApplication111
                     Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDefaultIdentity<IdentityUser>(options =>
-            {   options.SignIn.RequireConfirmedAccount = true;
+            {   options.SignIn.RequireConfirmedAccount = false;
+                options.SignIn.RequireConfirmedEmail = false;
                 options.Lockout.AllowedForNewUsers = true;
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(999);
+                options.User.RequireUniqueEmail = true;
             }
             ).AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();

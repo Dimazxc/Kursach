@@ -81,28 +81,30 @@
         border-width: 5px;
         border-color: chartreuse;
     }
-
-    
 </style>
 
-
 <script>
-
     $('#searchBox').on('input', function () {
-        if (this.value.length > 0) {
-            var text = createTermWord(this.value);
-            $.get('/Home/SearchCompany', { information: text }, function (companies) {
-                var containerResult = select('#searchResult');
-                $('#searchResult').empty();
-                companies.forEach(company => {
-                    var poiner = createElement('a').addClass('list-group-item list-group-item-action').html(company.name).attribute('href', '/Profile/ReadOnlyCmp?id=' + company.id).parent(containerResult);
-                })
-            });
-        }
-    });
+        var containerResult = $('#searchResult');
+            if (this.value.length > 0) {
+                var text = createTermWord(this.value);
+                $.get('/Home/SearchCompany', { searchTerm: text }, function (companies) {
+                    containerResult.empty();
+                    companies.forEach(company => {
+                        var p = $("<a>", { class: "list-group-item list-group-item-action", text: company.name, href: hrefToCmp + company.id });
+                        containerResult.append(p);
+                    })
+                });
+            } else containerResult.empty();
+        });
 
     function createTermWord(text) {
-        return text.replaceAll(' ', '* or ').concat('*');
+        var allword = text.split(' ');
+        var resultTerm = [];
+        allword.forEach(w => {
+            resultTerm.push('"' + w + '*"')
+        })
+        return resultTerm.join(' or ');
     }
     
     $('[data-dismiss=modal]').on('click', function (e) {

@@ -2,6 +2,7 @@
 @using WebApplication111.Data;
 @using Microsoft.EntityFrameworkCore;
 @using Newtonsoft.Json;
+@using WebApplication111.Models;
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 @inject ApplicationDbContext DbContext
@@ -53,26 +54,32 @@
         <span class="carousel-control-next-icon"></span>
     </a>
 </div>
-<br>
+<br>    
 <br>
 
-<h2>Add some tags for filter: </h2>
-<input name='tags' style="font-size:15px" placeholder='write some tags' id="finder">
-<br>
-<div class="text-center"><button class="btnfilter btn-success" id="filterbutton">Filter</button></div>
-<br>
-<div class="card-group" id="filteredCompanies">
+<div class="container-shadow mb-5">
+    <h2>Add some tags for filter: </h2>
+    <div class="notranslate">
+        <input name='tags' style="font-size:15px" placeholder='write some tags' id="finder">
+    </div>
+    <br>
+    <div class="text-center"><button class="btnfilter btn-success" id="filterbutton">Filter</button></div>
+    <br>
+    <div class="card-group" id="filteredCompanies">
+    </div>
 </div>
 
-<h2>Last updated companies: </h2>
-<div class="card-group" id="updatedCompanies">
+<div class="container-shadow mb-5">
+    <h2>Last updated companies: </h2>
+    <div class="card-group" id="updatedCompanies">
+    </div>
 </div>
 
-<br>
-<br>
-<h2>The most rated companies: </h2>
-<div class="card-group" id="ratedCompanies">
+<div class="container-shadow mb-5">
+    <h2>The most rated companies: </h2>
+    <div class="card-group" id="ratedCompanies">
 
+    </div>
 </div>
 
 <style>
@@ -93,12 +100,17 @@
         margin-bottom: 20px;
     }
 
-    .tagify{
-        font-size:20px;
+    .tagify {
+        font-size: 20px;
     }
 
     .tagify__input:focus {
         font-size: 20px;
+    }
+
+    .container-shadow {
+        box-shadow: 0 0 20px rgb(42 159 214);
+        padding: 30px;
     }
 </style>
 

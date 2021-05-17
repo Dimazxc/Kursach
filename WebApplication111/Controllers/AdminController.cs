@@ -22,7 +22,7 @@ namespace WebApplication111.Controllers
         {
             this.userManager = userManager;
             this.context = context;
-            this.endBlockDay = new DateTime(2221, 06, 06);
+            this.endBlockDay = new DateTime(2222, 06, 06);
         }
 
         [HttpGet]
@@ -47,17 +47,19 @@ namespace WebApplication111.Controllers
                 await userManager.AddToRoleAsync(user, "Admin");
             }
 
-            return Ok();
+            return Ok("Success make admins");
         }
 
         public async Task<IActionResult> DeleteUsers(string[] usersId)
         {
+            int succesDeleted = 0;
             foreach (var id in usersId)
             {
                 var user = await userManager.FindByIdAsync(id);
                 var userCompanies = await context.Companies.Where(i => i.UserId == id).ToListAsync(); ;
                 if (userCompanies.Count == 0)
                 {
+                    succesDeleted++;
                     var logins = await userManager.GetLoginsAsync(user);
                     foreach (var login in logins) await userManager.RemoveLoginAsync(user, login.LoginProvider, login.ProviderKey);
                     await userManager.RemoveFromRoleAsync(user, "User");
@@ -65,7 +67,7 @@ namespace WebApplication111.Controllers
                 }
             }
 
-            return Ok();
+            return Ok("Succes deleted: " + succesDeleted);
         }
 
         public async Task<IActionResult> LockUsers(string[] userId)
@@ -79,7 +81,7 @@ namespace WebApplication111.Controllers
                 await userManager.UpdateAsync(user);
             }
 
-            return Ok();
+            return Ok("Succes locked");
         }
 
         public async Task<IActionResult> UnlockUsers(string[] userId)
@@ -89,10 +91,10 @@ namespace WebApplication111.Controllers
                 var user = await userManager.FindByIdAsync(id);
                 await userManager.SetLockoutEndDateAsync(user, DateTime.Now);
                 await userManager.SetLockoutEnabledAsync(user, false);
-                var result = await userManager.UpdateAsync(user);
+                await userManager.UpdateAsync(user);
             }
 
-            return Ok();
+            return Ok("Succes unlocked");
         }
 
         public async Task<JsonResult> GetUsers()
